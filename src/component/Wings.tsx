@@ -111,7 +111,7 @@ const Wings: React.FC<Props> = ({pdata, eid, sid}) => {
     if (pdata?.propertyid) fetchProperty();
   }, [pdata?.propertyid]);
 
-  if (!property) return <Text>Wings Not Found !</Text>;
+  if (!property) return <Text style={{color:'black'}}>Wings Not Found !</Text>;
 
   return (
     <>

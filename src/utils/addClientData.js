@@ -59,7 +59,7 @@ export const addClientFields = [
       {
         label: "Received",
         value: "Received",
-        color: "#0A74DA",
+        color: "#0078DB",
       },
     ],
   },

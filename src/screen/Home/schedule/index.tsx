@@ -248,7 +248,7 @@ const VisitCard: React.FC<Props> = ({enquiry}) => {
 const getStatusStyle = (status: string) => {
   switch (status) {
     case 'New':
-      return { backgroundColor: '#22C55E' }; // #0A74DA
+      return { backgroundColor: '#22C55E' }; // #0078DB
     case 'Visit Scheduled':
       return { backgroundColor: '#3B82F6' }; // blue
     case 'Token':
@@ -265,7 +265,7 @@ const getStatusStyle = (status: string) => {
 const getStatusStyleText = (status: string) => {
   switch (status) {
     case 'New':
-      return { color: '#22C55E', backgroundColor: '#DCFCE7' }; // #0A74DA
+      return { color: '#22C55E', backgroundColor: '#DCFCE7' }; // #0078DB
     case 'Visit Scheduled':
       return { color: '#3B82F6', backgroundColor: '#DBEAFE' }; // blue
     case 'Token':

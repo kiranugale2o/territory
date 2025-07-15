@@ -134,39 +134,6 @@ const WingsFlatsList: React.FC<WingsFlatsListProps> = ({
           });
 
           return (
-            // <View key={wing} style={styles.wingSection}>
-            //   <Text style={styles.wingTitle}>Wing {wing}</Text>
-            //   <View style={styles.columnsContainer}>
-            //     {columns.map((colFlats, colIdx) => (
-            //       <View key={`${wing}_col_${colIdx}`} style={styles.column}>
-            //         {colFlats.map(flat => {
-            //           const isSelected = selectedFlatId === flat.propertyinfoid;
-            //           return (
-            //             <TouchableOpacity
-            //               key={`${flat.propertyinfoid}_${flat.flatno}`}
-            //               style={[
-            //                 styles.flatCard,
-            //                 isSelected && styles.selectedFlatCard,
-            //               ]}
-            //               onPress={() => {
-            //                 selectFlat(flat.propertyinfoid);
-            //               }}
-            //               activeOpacity={0.7}>
-            //               <Text
-            //                 style={[
-            //                   styles.flatText,
-            //                   isSelected && styles.selectedFlatText,
-            //                 ]}>
-            //                 {flat.flatno}
-            //               </Text>
-            //             </TouchableOpacity>
-            //           );
-            //         })}
-            //       </View>
-            //     ))}
-            //   </View>
-            // </View>
-
             <View key={wing} style={styles.wingSection}>
               <Text style={styles.wingTitle}>Wing {wing}</Text>
               <View style={styles.columnsContainer}>
@@ -319,7 +286,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedFlatCard: {
-    backgroundColor: '#076300',
+    backgroundColor: '#0078DB',
     //  borderColor: '#2E7D32',
   },
   flatText: {

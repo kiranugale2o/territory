@@ -287,7 +287,7 @@ function AppStack() {
           },
           headerBackground: () => (
             <LinearGradient
-              colors={["#0078DB", "#076300"]}
+              colors={["#0078DB", "#0078DB"]}
               start={{ x: 0.2, y: 0.1 }}
               end={{ x: 0.0, y: 0.4 }}
               style={{ flex: 1 }}

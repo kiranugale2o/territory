@@ -38,7 +38,7 @@ const getColorByValue = (value: string) => {
     case 'visit Reschedule':
       return 'gray';
     case 'Received':
-      return '#0A74DA';
+      return '#0078DB';
     default:
       return 'gray';
   }

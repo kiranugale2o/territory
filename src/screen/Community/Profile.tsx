@@ -211,7 +211,7 @@ const UserProfile: React.FC = () => {
       {/* Info */}
       <View style={styles.infoRow}>
          <Info label="City" value={user.city || '—'} />
-        <Info label="" value={ '—'} />
+        <Info label="State" value={ user?.state || '—'} />
        
       </View>
 

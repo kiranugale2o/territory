@@ -222,7 +222,7 @@ const TicketCard: React.FC<TicketCardProps> = ({
 const dotColorStyles = StyleSheet.create({
   Open: {backgroundColor: '#0078DB'},
   Closed: {backgroundColor: '#FF4D4F'},
-   Resolved: { backgroundColor: '#0BB501' },
+   Resolved: { backgroundColor: '#0078DB' },
   In_Progress: {backgroundColor: 'yellow'},
   Pending:{backgroundColor:'red'}
 });
@@ -230,7 +230,7 @@ const dotColorStyles = StyleSheet.create({
 const borderColorStyles = StyleSheet.create({
   Open:        { borderLeftColor: '#0078DB' },
   Closed:      { borderLeftColor: '#FF4D4F' },
-  Resolved:    { borderLeftColor: '#0BB501' },
+  Resolved:    { borderLeftColor: '#0078DB' },
   In_Progress: { borderLeftColor: 'yellow' },
   Pending:     { borderLeftColor: 'red' },
 });
@@ -238,7 +238,7 @@ const borderColorStyles = StyleSheet.create({
 
 const statusTextColor = StyleSheet.create({
   Open: {color: '#0078DB'},
-  Resolved:   {color: '#0BB501'},
+  Resolved:   {color: '#0078DB'},
   Closed: {color: '#FF4D4F'},
   In_Progress: {color: 'yellow'},
 Pending: {color: 'red'},

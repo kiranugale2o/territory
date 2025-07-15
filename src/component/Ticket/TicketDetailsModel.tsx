@@ -151,7 +151,7 @@ const TicketDetailsModal: React.FC<TicketDetailsModalProps> = ({
                 fontWeight: 'bold',
                 marginBottom: 16,
                 textAlign: 'center',
-                color:'black'
+                color:'blacks'
               }}>
               Ticket Details
             </Text>

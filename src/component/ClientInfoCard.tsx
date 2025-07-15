@@ -798,12 +798,16 @@ console.log(formData);
 
   // Use it as shown above
 
-  const propertyOptions = propertyList?.map((property, index) => ({
+ 
+const propertyOptions = propertyList
+  ?.filter(property => property.approve === "Approved" && property.status === "Active")
+  .map((property, index) => ({
     key: property.propertyid,
-    label: `${property.propertyName} \n | ${
-      property.builtUpArea
-    } SqFt | ₹${formatIndianAmount(property?.totalOfferPrice)}`,
+    label: `${property.propertyName} \n | ${property.builtUpArea} SqFt | ₹${formatIndianAmount(property?.totalOfferPrice)}`,
   }));
+
+
+  
 
   
  

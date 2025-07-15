@@ -10,12 +10,13 @@ import {
   Linking,
   Modal,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import Svg, {Defs, LinearGradient, Path, Rect, Stop} from 'react-native-svg';
 import PropertyOverviewCard from '../../component/PropertyOverviewCard';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import {PropertyInfo, RootStackParamList} from '../../types';
-
+import {FormatPrice} from '../../utils';
 import {CheckCheck, MapPin, Star, X, XCircle} from 'lucide-react-native';
 import Wings from '../../component/Wings';
 import SuccessModal from '../../component/PaymentModules/SuccessModel';
@@ -23,7 +24,6 @@ import ConfirmBookingPopup from '../../component/ConfirmBookingPopup';
 import {AuthContext} from '../../context/AuthContext';
 import {payNow} from '../../utils/razorpay';
 import SiteVisitModal from '../../component/SiteVisitPopUp';
-import {FormatPrice} from '../../utils';
 import PropertyOverview from '../../component/PropertyOverviewCard';
 
 const {width} = Dimensions.get('window');
@@ -54,9 +54,11 @@ const PropertyDetails: React.FC = () => {
   const {propertyid} = route.params;
   const {enquirersid} = route.params;
   const {salespersonid} = route.params;
+  const {booktype} = route.params;
   const [showPopup, setShowPopup] = useState(false);
   const auth = useContext(AuthContext);
   const [showSiteVisitPopup, setShowSiteVisitPopup] = useState(false);
+
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
   const [showBenifits, setShowBenifits] = useState(false);
@@ -102,7 +104,6 @@ const PropertyDetails: React.FC = () => {
       scrollTo(currentIndex - 1);
     }
   };
-console.log(propertyData,'proooo');
 
   const images = [
     propertyData?.frontView ? JSON.parse(propertyData.frontView)[0] : null,
@@ -110,7 +111,6 @@ console.log(propertyData,'proooo');
     propertyData?.hallView ? JSON.parse(propertyData.hallView)[0] : null,
     propertyData?.kitchenView ? JSON.parse(propertyData.kitchenView)[0] : null,
     propertyData?.bedroomView ? JSON.parse(propertyData.bedroomView)[0] : null,
- //   propertyData?.nearestLandmark ? JSON.parse(propertyData.nearestLandmark)[0] : null,
     propertyData?.nearestLandmark
       ? JSON.parse(propertyData.nearestLandmark)[0]
       : null,
@@ -178,8 +178,7 @@ console.log(propertyData,'proooo');
     const num = Number(val);
     return isNaN(num) ? 0 : num;
   };
-  console.log(propertyData);
-//console.log(PropertyDetails.availableCount,'fff');
+  //console.log(propertyData);
 
   const basePrice = parse(propertyData?.totalOfferPrice);
 
@@ -202,14 +201,16 @@ console.log(propertyData,'proooo');
     msebWater +
     maintenance +
     other;
-    const showApprovedBy = propertyData?.propertyCategory !== 'FarmLand';
+
+      const showApprovedBy = propertyData?.propertyCategory !== 'FarmLand';
   const showRERA = ['NewFlat', 'NewPlot'].includes(propertyData?.propertyCategory);
+
 
   return (
     <>
       <ScrollView style={{flex: 1, width: '100%', backgroundColor: 'white'}}>
         <View style={styles.container}>
-          <ScrollView
+       <ScrollView
   ref={scrollRef}
   horizontal
   pagingEnabled
@@ -372,7 +373,10 @@ console.log(propertyData,'proooo');
         </Modal>
 
         {/* Flat Selection & Wings */}
-       {/* Flat Selection & Wings */}
+         {typeof propertyData?.propertyCategory === 'string' &&
+    ['NewPlot', 'NewFlat', 'CommercialFlat', 'CommercialPlot'].includes(
+      propertyData.propertyCategory,
+    ) && (
       <View
   style={{
     flex: 1,
@@ -383,6 +387,7 @@ console.log(propertyData,'proooo');
     borderColor: '#d32f2f',     // red border
     borderWidth: 1,
     borderRadius: 12,
+ 
     padding: 12,
     shadowColor: '#d32f2f',
     shadowOpacity: 0.3,
@@ -402,8 +407,10 @@ console.log(propertyData,'proooo');
       />
     )}
 </View>
+    )}
 
 
+       
         <View style={styles.cardContainer}>
           {/* Heading Section */}
           <View style={styles.headingContainer}>
@@ -431,7 +438,7 @@ console.log(propertyData,'proooo');
             borderRadius: 8,
           }}
         >
-          <Text style={{ fontSize: 12 }}>{propertyData?.availableCount}</Text>
+          <Text style={{ fontSize: 12,color:'black' }}>{propertyData?.availableCount}</Text>
         </View>
       </View>
 
@@ -456,7 +463,7 @@ console.log(propertyData,'proooo');
             borderRadius: 8,
           }}
         >
-          <Text style={{ fontSize: 12 }}>{propertyData?.bookedCount}</Text>
+          <Text style={{ fontSize: 12,color:'black' }}>{propertyData?.bookedCount}</Text>
         </View>
       </View>
     </View>
@@ -697,7 +704,6 @@ console.log(propertyData,'proooo');
           </View>
         </View>
 
-
 <View style={{width:'95%',margin:'auto',marginTop:0,padding:5}}>
   <Text style={{fontSize:18,fontWeight:'600',color:'black'}}>Property Details</Text>
 <View style={{}}>
@@ -705,8 +711,10 @@ console.log(propertyData,'proooo');
     propertyData?.propertyName}</Text>
 </View>
 </View>
+      
         {/* property overView */}
-         <PropertyOverview propertyInfo={propertyData}></PropertyOverview>
+        {/* <PropertyOverviewCard data={propertyData}></PropertyOverviewCard> */}
+        <PropertyOverview propertyInfo={propertyData}></PropertyOverview>
         {/* Featured and benifits */}
         <View style={{width: '95%', margin: 'auto', marginTop: 10}}>
           <View style={{alignSelf: 'stretch'}}>
@@ -1062,6 +1070,7 @@ console.log(propertyData,'proooo');
         onClose={() => setShowSiteVisitPopup(false)}
         id={propertyid}
       />
+
       {/* After Booking */}
       {showPopup && (
         <ConfirmBookingPopup
@@ -1201,7 +1210,9 @@ const styles = StyleSheet.create({
   cardContainer: {
     paddingHorizontal: 5,
     paddingVertical: 10,
-  
+    borderRadius: 10,
+    borderColor: 'gray',
+   // borderWidth: 0.5,
     marginTop: 20,
     gap: 16, // Use marginBottom on children if your RN version < 0.71
     width: '95%',
@@ -1517,7 +1528,7 @@ const PriceBenModal = ({
     {
       title: 'Expert Partner Network',
       description:
-        'Our trained Sales, Territory Partner, Onboarding, and Project Partners offer personalized service, ensuring a smooth buying experience.',
+        'Our trained Sales, Territory, Onboarding, and Project Partners offer personalized service, ensuring a smooth buying experience.',
     },
     {
       title: 'End-to-End Assistance',

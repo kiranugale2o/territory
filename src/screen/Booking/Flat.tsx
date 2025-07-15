@@ -35,7 +35,7 @@ const BookingFlats: React.FC = () => {
       );
 
       setFlats(newFlatProperties);
-     // console.log(newFlatProperties);
+     //console.log(newFlatProperties);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -74,6 +74,7 @@ const BookingFlats: React.FC = () => {
 
               marginTop: 'auto',
               justifyContent: 'center',
+              color:'black'
             }}>
             No Property Found !
           </Text>

@@ -1067,7 +1067,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-start',
     borderRadius: 16,
-    backgroundColor: '#076300',
+    backgroundColor: '#0078DB',
     // gradient workaround using overlay if needed
   },
 

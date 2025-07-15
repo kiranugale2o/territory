@@ -34,7 +34,7 @@ const optionsR = [
 ];
 
 const optionsL = [
-  {label: 'Token', value: 'token', color: '#076300', select: false},
+  {label: 'Token', value: 'token', color: '#0078DB', select: false},
   {label: 'Cancelled', value: 'cancelled', color: '#EF4444', select: false},
 ];
 
@@ -628,7 +628,7 @@ const[imageShow,setimageShow]=useState(false)
             </Text>
             {payment?.created_at && (
               <Text style={styles.paymentDate}>
-                {payment?.created_at?.slice(0, 10)}
+                {payment?.created_at?.slice(0, 12)}
               </Text>
             )}
           </View>
@@ -771,6 +771,7 @@ const styles = StyleSheet.create({
 },
 
 paymentCardRow: {
+  paddingHorizontal:10,
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',

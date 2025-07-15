@@ -63,7 +63,7 @@ const Booking: React.FC = () => {
   ];
 
   const optionsL = [
-    {label: 'Token', value: 'token', color: '#076300'},
+    {label: 'Token', value: 'token', color: '#0078DB'},
     {label: 'Cancelled', value: 'cancelled', color: '#EF4444'},
   ];
 
@@ -286,6 +286,7 @@ const Booking: React.FC = () => {
                 alignContent: 'center',
                 justifyContent: 'center',
                 marginTop: 50,
+                color:'black'
               }}>
               Not Found Any Booking Records.
             </Text>
