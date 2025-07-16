@@ -9,7 +9,6 @@ import {
   FlatList,
   Image,
   Modal,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -22,6 +21,7 @@ import Loader from '../../component/loader';
 import UserPostCard from '../../component/community/UserPost';
 import Svg, { Line, Path } from 'react-native-svg';
 import { RootStackParamList } from '../../types';
+import { ArrowRightCircleIcon } from 'lucide-react-native';
 
 const screenWidth = Dimensions.get('window').width;
 const GRID_GAP = 2;
@@ -42,31 +42,75 @@ const UserProfile: React.FC = () => {
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
   const auth = useContext(AuthContext);
 
-  /* Networking */
+  const getUserIdByRole = (u: any) => {
+    if (u?.role === 'Sales Person') return u?.salespersonsid;
+    if (u?.role === 'Onboarding Partner') return u?.partnerid;
+    return u?.id;
+  };
+
+  const  getUserRole = (r:any) => {
+  if (r === "Sales Person") return "sales";
+  if (r === "Territory Partner") return "territory";
+  if (r === "Onboarding Partner") return "onboarding";
+  return "projectpartner";
+};
 
   const fetchUserPosts = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(
-        `https://api.reparv.in/territory-partnerapp/post/getUserPosts?id=${user?.id}`,
+  const controller = new AbortController();
+  try {
+    setLoading(true);
+    const id = getUserIdByRole(user);
+
+    // Fetch both endpoints in parallel
+    const [territoryRes, salesRes] = await Promise.all([
+      fetch(
+        `https://api.reparv.in/territoryapp/post/getUserPosts?id=${id}`,
+        { signal: controller.signal }
+      ),
+      fetch(
+        `https://api.reparv.in/salesapp/post/getUserPosts?id=${id}`,
+        { signal: controller.signal }
+      ),
+    ]);
+
+    if (!territoryRes.ok) throw new Error(`Territory API status ${territoryRes.status}`);
+    if (!salesRes.ok) throw new Error(`Sales API status ${salesRes.status}`);
+
+    const [territoryData, salesData] = await Promise.all([
+      territoryRes.json(),
+      salesRes.json(),
+    ]);
+
+    // Combine posts
+    const combinedPosts = [...territoryData, ...salesData];
+
+    // Optionally, sort by recency (newest first)
+    combinedPosts.sort((a, b) => {
+      return (
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
-      if (!res.ok) throw new Error(`Status ${res.status}`);
-      const data = await res.json();
-      setPosts(data);
-    } catch (e) {
-      console.error('Failed to fetch user posts', e);
-    } finally {
-      setLoading(false);
+    });
+
+    setPosts(combinedPosts);
+  } catch (e: any) {
+    if (e.name !== "AbortError") {
+      console.error("Failed to fetch user posts", e);
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+  return () => controller.abort();
+};
 
 
   const fetchFollowersAndFollowing = () => {
-    fetch(`https://api.reparv.in/territoryapp/user/${user?.id}/followers`)
+    const idToUse = getUserIdByRole(user);
+https://192.168.132.151:3000
+    fetch(`https://api.reparv.in/territoryapp/user/add/${idToUse}/${getUserRole(user?.role)}/followers`)
       .then(res => res.json())
       .then(setFollowers);
 
-    fetch(`https://api.reparv.in/territoryapp/user/${user?.id}/following`)
+    fetch(`https://api.reparv.in/territoryapp/user/add/${idToUse}/${getUserRole(user?.role)}/following`)
       .then(res => res.json())
       .then(setFollowing);
   };
@@ -74,25 +118,36 @@ const UserProfile: React.FC = () => {
   const checkFollowingStatus = async () => {
     try {
       const res = await fetch(
-        `https://api.reparv.in/territoryapp/user/${auth?.user?.id}/following`,
+        `https://api.reparv.in/territoryapp/user/add/${auth?.user?.id}/${getUserRole(auth?.user?.role)}/following`
       );
       const data = await res.json();
-      const already = data.some((f: any) => f.id === user?.id);
-      setIsFollowing(already);
+
+      const followedUserId = getUserIdByRole(user);
+
+      const isAlreadyFollowing = data.some((f: any) => {
+  return f.id?.toString() === followedUserId?.toString();
+});
+
+      setIsFollowing(isAlreadyFollowing);
     } catch (err) {
       console.error('Failed to check follow status:', err);
     }
   };
 
   const toggleFollow = async () => {
+    const idToUse = getUserIdByRole(user);
+    const userRole=getUserRole(user?.role);
     const payload = {
       follower_id: auth?.user?.id,
-      following_id: user?.id,
+      following_id: idToUse,
+      follower_type: 'territory',
+      following_type: userRole,
     };
 
+    
     const url = isFollowing
-      ? 'https://api.reparv.in/territoryapp/user/unfollow'
-      : 'https://api.reparv.in/territoryapp/user/follow';
+      ? 'https://api.reparv.in/territoryapp/user/add/unfollow'
+      : 'https://api.reparv.in/territoryapp/user/add/follow';
 
     try {
       const res = await fetch(url, {
@@ -101,26 +156,23 @@ const UserProfile: React.FC = () => {
         body: JSON.stringify(payload),
       });
 
-      if (res.status === 200) {
-        console.log(res,'fgg');
-        
+      if (res.ok) {
         const data = await res.json();
-        // Toast.show({
-        //   type: 'success',
-        //   text1: isFollowing ? 'Unfollowed' : 'Followed',
-        //   text2: data?.status ?? '',
-        // });
+        Toast.show({
+          type: 'success',
+          text1: isFollowing ? 'Unfollowed' : 'Followed',
+          text2: data?.status ?? '',
+        });
         setIsFollowing(!isFollowing);
+        fetchFollowersAndFollowing();
       } else {
-         console.log(res,'fgg');
-        // Toast.show({
-        //   type: 'error',
-        //   text1: 'Error',
-        //   text2: 'Action failed.',
-        // });
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Action failed.',
+        });
       }
     } catch (error: any) {
-      // console.log(res,'fgg');
       console.error('Follow/Unfollow Error:', error);
       Toast.show({
         type: 'error',
@@ -128,33 +180,45 @@ const UserProfile: React.FC = () => {
         text2: error.message,
       });
     }
-
-    fetchFollowersAndFollowing();
   };
 
   useFocusEffect(
     useCallback(() => {
       fetchUserPosts();
-    }, []),
+    }, [])
   );
 
   useEffect(() => {
     fetchFollowersAndFollowing();
     checkFollowingStatus();
-  }, [user?.id]);
+  }, [user]);
 
-  const renderThumb = ({ item }: { item: any }) => (
-    <TouchableOpacity
-      onPress={() => {
-        setSelectedPost(item);
-        setModalVisible(true);
-      }}>
-      <Image
-        source={{ uri: `https://api.reparv.in${item.image}` }}
-        style={styles.postThumb}
-      />
-    </TouchableOpacity>
-  );
+  const renderThumb = ({ item }: { item: any }) => {
+    const hasImage = !!item.image;
+
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          setSelectedPost(item);
+          setModalVisible(true);
+        }}
+        style={styles.postThumbWrapper}
+      >
+        {hasImage ? (
+          <Image
+            source={{ uri: `https://api.reparv.in${item.image}` }}
+            style={styles.postThumb}
+          />
+        ) : (
+          <View style={[styles.postThumb, styles.textOnlyThumb]}>
+            <Text style={styles.textOnlyContent} numberOfLines={4}>
+              {item.postContent || 'No Content'}
+            </Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
 
   const NoPostPlaceholder = () => (
     <View style={styles.noPostBox}>
@@ -187,7 +251,7 @@ const UserProfile: React.FC = () => {
             <Stat label="Followers" value={followers.length} />
             <Stat label="Following" value={following.length} />
           </View>
-          {auth?.user?.id !== user?.id && (
+          {auth?.user?.id !== getUserIdByRole(user) && (
             <TouchableOpacity
               onPress={toggleFollow}
               style={[
@@ -210,9 +274,8 @@ const UserProfile: React.FC = () => {
 
       {/* Info */}
       <View style={styles.infoRow}>
-         <Info label="City" value={user.city || '—'} />
-        <Info label="State" value={ user?.state || '—'} />
-       
+        <Info label="City" value={user.city || '—'} />
+        <Info label="State" value={user?.state || '—'} />
       </View>
 
       {/* Posts */}
@@ -242,7 +305,7 @@ const UserProfile: React.FC = () => {
             onPress={() => setModalVisible(false)}
             style={styles.closeBtn}
           >
-            <Text style={styles.closeText}>Close</Text>
+            <ArrowRightCircleIcon />
           </TouchableOpacity>
 
           {selectedPost && <UserPostCard post={selectedPost} />}
@@ -270,6 +333,10 @@ const Info = ({ label, value }: { label: string; value: string }) => (
     <Text style={styles.infoValue}>{value}</Text>
   </View>
 );
+
+/* Styles */
+/* ... keep your styles unchanged ... */
+
 
 /* Styles */
 const styles = StyleSheet.create({
@@ -316,7 +383,7 @@ const styles = StyleSheet.create({
   followBtn: {
     marginTop: 12,
     alignSelf: 'stretch',
-    backgroundColor: '#0095f6',
+    backgroundColor: '#00C851',
     paddingVertical: 6,
     borderRadius: 6,
   },
@@ -346,6 +413,24 @@ const styles = StyleSheet.create({
     margin: GRID_GAP,
     backgroundColor: '#ddd',
   },
+postThumbWrapper: {
+  margin: GRID_GAP,
+  width: THUMB_SIZE,
+  height: THUMB_SIZE,
+},
+
+textOnlyThumb: {
+  backgroundColor: '#f0f0f0',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: 6,
+},
+
+textOnlyContent: {
+  fontSize: 12,
+  color: '#333',
+  textAlign: 'center',
+},
 
   noPostBox: {
     alignItems: 'center',
@@ -361,7 +446,7 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     position: 'absolute',
-    top: 20,
+    top: 0,
     right: 20,
     zIndex: 10,
     padding: 10,

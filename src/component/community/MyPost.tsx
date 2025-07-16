@@ -16,6 +16,8 @@ import {
 } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import Svg, { Path } from 'react-native-svg';
+import Toast from 'react-native-toast-message';
+import { toastConfig } from '../../utils';
 
 type PostProps = {
   postId: number;
@@ -78,7 +80,7 @@ const MyPost: React.FC<{ post: PostProps }> = ({ post }) => {
   };
 
 
-  const [content, setContent] = useState(post?.content || '');
+  const [content, setContent] = useState(post?.postContent || '');
   const [image, setImage] = useState(post?.image || null);
  const[visible,setVisible]=useState(false);
   const[deleteVisible,setDeleteVisible]=useState(false)
@@ -96,71 +98,72 @@ const MyPost: React.FC<{ post: PostProps }> = ({ post }) => {
         },
       );
     };
-
  
-  
- const updatePost = async () => {
+const updatePost = async () => {
   const formData = new FormData();
- 
   formData.append('postContent', content);
-  formData.append('userId', 12);
+  
+ 
+    if (image) {
+  formData.append('image', {
+    uri: image.uri!,
+    type: image.type!,
+    name: image.fileName ?? 'photo.jpg',
+  });
+}
 
-  if (image) {
-    const fileName = image.split('/').pop();
-    const fileType = fileName.split('.').pop();
-
-    formData.append('image', {
-      uri: image,
-      name: fileName,
-      type: `image/${fileType}`,
-    });
-  }
 
   try {
     const response = await fetch(`https://api.reparv.in/territoryapp/post/updated/${post?.postId}`, {
       method: 'PUT',
-     headers: {
-        'Content-Type': 'application/json',
-      },
       body: formData,
     });
 
     const data = await response.json();
 
     if (response.ok) {
+      setVisible(false);
+  
+      Toast.show({
+        type:'success',
+        text1:'Post updated successfully'
+      })
+      navigation.goBack()
       console.log('Post updated successfully:', data);
       // You can update state or navigate here
     } else {
+        Toast.show({
+        type:'error',
+        text1:'Failed to update post:'
+      })
       console.error('Failed to update post:', data);
     }
   } catch (error) {
+      Toast.show({
+        type:'error',
+        text1:'Failed to update post:'
+      })
     console.error('API error:', error);
   }
 };
 
+ 
 
 const deletePost = async () => {
   try {
-    const response = await fetch(`https://api.reparv.in/territoryapp/post/deletepost/${post.postId}`, {
+   const response = await fetch(`https://api.reparv.in/territoryapp/post/deletepost/${post.postId}`, {
       method: 'DELETE',
+       headers: {
+    'Content-Type': 'application/json',
+  },
     });
 
-    const text = await response.text(); // <- important
-    console.log('Raw response:', text);
-
-    // Try parsing if it's actually JSON
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      console.error('Not JSON:', e);
-      Alert.alert('Error', 'Server returned non-JSON response');
-      return;
-    }
+    const data = await response.json();
 
     if (response.ok) {
       Alert.alert('Success', 'Post deleted successfully');
-      navigation.goBack();
+      // Optional: Refresh post list or update UI
+     navigation.goBack()
     } else {
       Alert.alert('Error', data.message || 'Failed to delete post');
     }
@@ -282,16 +285,23 @@ const deletePost = async () => {
           <TextInput
             value={content}
             onChangeText={setContent}
+            placeholderTextColor={'gray'}
             placeholder="Update your post..."
             style={styles.input}
             multiline
           />
 
-          {image ? (
-            <Image source={{ uri: image }} style={styles.imagePreview} />
-          ) : (
-            <Text style={styles.noImageText}>No image selected</Text>
-          )}
+        
+     {image ? (
+  <Image
+    source={{
+      uri: typeof image === 'string' ?  `https://api.reparv.in${image}` : image.uri
+    }}
+    style={styles.imagePreview}
+  />
+) : (
+  <Text style={styles.noImageText}>No image selected</Text>
+)}
 
           <TouchableOpacity onPress={handleImagePick} style={styles.imageButton}>
             <Text style={styles.imageButtonText}>Change Image</Text>
@@ -309,7 +319,7 @@ const deletePost = async () => {
         </View>
       </View>
     </Modal>
-
+<Toast config={toastConfig}/>
 
 <Modal visible={deleteVisible} transparent animationType="fade" onRequestClose={()=>{setDeleteVisible(false)}}>
       <View
@@ -548,7 +558,7 @@ popupTitle: {
 },
  closeButton: {
     marginTop: 10,
-    backgroundColor: '#0078DB',
+    backgroundColor: 'green',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -599,6 +609,7 @@ closePopupBtnText: {
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 8,
+    color:'black',
     padding: 10,
     minHeight: 100,
     textAlignVertical: 'top',

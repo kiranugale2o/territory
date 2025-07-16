@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   enabledButton: {
-    backgroundColor: '#00C851', // #0078DB color when active
+    backgroundColor: '#00C851', // Green color when active
   },
 
   disabledButton: {

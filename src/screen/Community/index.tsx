@@ -219,10 +219,25 @@ const sortPosts = (posts:any, currentUser:any, followedIds:any) => {
   });
 };
 
-// useEffect(()=>{
+//user Filter 
+  const [usersearchTerm, setUserSearchTerm] = useState('');
 
+  // Filter data based on fullname or city
+ const filteredUser = useMemo(() => {
+  const lower = usersearchTerm.toLowerCase();
 
-// },[])
+  if (Array.isArray(users)) {
+    return users.filter(
+      item =>
+        item?.fullname?.toLowerCase().includes(lower) ||
+        item?.city?.toLowerCase().includes(lower) ||
+        item?.role?.toLowerCase().includes(lower) 
+      
+    );
+  }
+
+  return [];
+}, [usersearchTerm, users]);
 
 
 
@@ -442,15 +457,38 @@ const renderThumb = ({ item }: { item: any }) => {
       </View>
     </ScrollView>
   </View>
+    
 ) : selectedTab === 'follow' ? (
   <View
     style={{
       width: '100%',
       flex: 1,
-      marginTop: 20,
+    //  marginTop: 20,
       backgroundColor: 'white',
     }}>
-    <View style={styles.container}>
+       {/* Button for new */}
+    <View style={[styles.scontainer,{marginTop:0}]}>
+      {/* Search Input */}
+      <View style={styles.searchBox}>
+       <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+          <Path
+            d="M19.6 21L13.3 14.7C12.8 15.1 12.225 15.4167 11.575 15.65C10.925 15.8833 10.2333 16 9.5 16C7.68333 16 6.14583 15.3708 4.8875 14.1125C3.62917 12.8542 3 11.3167 3 9.5C3 7.68333 3.62917 6.14583 4.8875 4.8875C6.14583 3.62917 7.68333 3 9.5 3C11.3167 3 12.8542 3.62917 14.1125 4.8875C15.3708 6.14583 16 7.68333 16 9.5C16 10.2333 15.8833 10.925 15.65 11.575C15.4167 12.225 15.1 12.8 14.7 13.3L21 19.6L19.6 21ZM9.5 14C10.75 14 11.8125 13.5625 12.6875 12.6875C13.5625 11.8125 14 10.75 14 9.5C14 8.25 13.5625 7.1875 12.6875 6.3125C11.8125 5.4375 10.75 5 9.5 5C8.25 5 7.1875 5.4375 6.3125 6.3125C5.4375 7.1875 5 8.25 5 9.5C5 10.75 5.4375 11.8125 6.3125 12.6875C7.1875 13.5625 8.25 14 9.5 14Z"
+            fill="rgba(0,0,0,0.4)"
+          />
+        </Svg>
+        <TextInput
+          style={styles.textInput}
+          placeholder="Search"
+          placeholderTextColor="rgba(0,0,0,0.4)"
+          value={usersearchTerm}
+          onChangeText={setUserSearchTerm}
+        />
+      </View>
+
+     
+    </View>
+    <View style={[styles.container,{paddingHorizontal:20}]}>
+      
       <View style={styles.row}>
         <Svg
                 width="30"
@@ -463,7 +501,6 @@ const renderThumb = ({ item }: { item: any }) => {
                   fill="#0078DB"
                 />
               </Svg>
-       
         <Text style={styles.title}>Follow Sale People</Text>
       </View>
       <Text style={styles.subText}>Connect with people</Text>
@@ -471,8 +508,10 @@ const renderThumb = ({ item }: { item: any }) => {
 
     <View style={{width: '100%', marginTop: 20}}>
       <ScrollView>
-        {users.map((d, i) => (
-          d?.status === 'Active' && (
+        {filteredUser.length!==0 ?(<>
+        {filteredUser.map((d, i) => (
+        (( d?.status === 'Active' && (d?.salespersonsid!==auth?.user?.id))) && (
+
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate('UserProfile', {user: d});
@@ -490,15 +529,18 @@ const renderThumb = ({ item }: { item: any }) => {
                 />
                 <View style={styles.textContainer}>
                   <Text style={styles.name}>{d.fullname}</Text>
-                    <Text style={{fontSize
+                  <Text style={{fontSize
                     :13,color:'black'
                   }}>{d.role}</Text>
-                
                 </View>
               </View>
             </TouchableOpacity>
           )
         ))}
+        </>): (
+          <Text style={{fontSize: 18,color:'black',padding:20}}>Not Found Any User !</Text>
+        )
+         }
       </ScrollView>
     </View>
   </View>
