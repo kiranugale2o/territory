@@ -14,71 +14,72 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import Svg, {ClipPath, Path} from 'react-native-svg';
+import Svg, { ClipPath, Path } from 'react-native-svg';
 import TicketCard from '../../component/TicketCard';
 // import BottomDrawer from '../../component/BottomDrawer';
-import {useCallback, useContext, useEffect, useRef, useState} from 'react';
-import {Picker} from '@react-native-picker/picker';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { Picker } from '@react-native-picker/picker';
 import CustomPicker from '../../component/CustomPicker';
 // import {createDrawerNavigator} from '@react-navigation/drawer';
-import {createDrawerNavigator} from '@react-navigation/drawer';
-import Home from '../Home/Home';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+
 import Booking from '../Booking';
-import {AuthContext} from '../../context/AuthContext';
-import {useFocusEffect} from '@react-navigation/native';
+import { AuthContext } from '../../context/AuthContext';
+import { useFocusEffect } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
+import Home from '../Home';
 
 // import BottomSheet from '@gorhom/bottom-sheet';
 // import {useMemo, useRef} from 'react';
 const Drawer = createDrawerNavigator();
-const {height} = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 const issue = {
   issueType: '',
   issueMessage: '',
 };
 
-export interface Ticket {
-  ticketid: number;
-  ticketadder: string;
-  adminid: string;
-  departmentid: string;
-  employeeid: string;
-  ticketno: string;
-  issue: string;
-  details: string;
-  response: string | null;
-  status: 'Open' | 'Closed' | 'In_Progress';
-  updated_at: string; // e.g., '06 May 2025 | 08:48 AM'
-  created_at: string;
-  admin_name: string | null;
-  department: string | null;
-  employee_name: string | null;
-  uid: string | null;
-}
-interface NewTicket {
-  adminid: string;
-  departmentid: string;
-  employeeid: string;
-  issue: string;
-  details: string;
-}
+// export interface Ticket {
+//   ticketid: number;
+//   ticketadder: string;
+//   adminid: string;
+//   departmentid: string;
+//   employeeid: string;
+//   ticketno: string;
+//   issue: string;
+//   details: string;
+//   response: string | null;
+//   status: 'Open' | 'Closed' | 'In_Progress';
+//   updated_at: string; // e.g., '06 May 2025 | 08:48 AM'
+//   created_at: string;
+//   admin_name: string | null;
+//   department: string | null;
+//   employee_name: string | null;
+//   uid: string | null;
+// }
+// interface NewTicket {
+//   adminid: string | null;
+//   departmentid: string | null;
+//   employeeid: string;
+//   issue: string;
+//   details: string;
+// }
 
-const Tickets: React.FC = () => {
+const Tickets = () => {
   const [visible, setVisible] = useState(false);
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [tickets, setTickets] = useState([]); // Removed Ticket[] type
   const [drawerHeight] = useState(new Animated.Value(height)); // Starting from bottom
-  const [selectedValue, setSelectedValue] = useState<string>('');
-  const [ticketDes, setTicketDis] = useState<string>('');
-  const [sucessShow, setSuccessShow] = useState<boolean>(false);
-  const [mainScreen, setMain] = useState<boolean>(true);
-  const [buttonShow, setButtonShow] = useState<boolean>(false);
-  const [issueData, setIssueData] = useState<typeof issue>(issue);
+  const [selectedValue, setSelectedValue] = useState('');
+  const [ticketDes, setTicketDis] = useState('');
+  const [sucessShow, setSuccessShow] = useState(false);
+  const [mainScreen, setMain] = useState(true);
+  const [buttonShow, setButtonShow] = useState(false);
+  const [issueData, setIssueData] = useState(issue); // Assuming 'issue' is already defined
   const [isFocused, setIsFocused] = useState(false);
   const [adminData, setAdminData] = useState([]);
   const [departmentData, setDepartmentData] = useState([]);
   const [employeeData, setEmployeeData] = useState([]);
-  const [newTicket, setNewTicketData] = useState<NewTicket>({
+  const [newTicket, setNewTicketData] = useState({
     adminid: '',
     departmentid: '',
     employeeid: '',
@@ -87,9 +88,9 @@ const Tickets: React.FC = () => {
   });
 
   const options = [
-    {label: 'Technical Issue', value: 'Technical Issue'},
-    {label: 'Commission Issue', value: 'Commission Issue'},
-    {label: 'Lead Issue', value: 'Lead Issue'},
+    { label: 'Technical Issue', value: 'Technical Issue' },
+    { label: 'Commission Issue', value: 'Commission Issue' },
+    { label: 'Lead Issue', value: 'Lead Issue' },
   ];
 
   const drawerHeighte = useRef(new Animated.Value(0)).current;
@@ -118,8 +119,8 @@ const Tickets: React.FC = () => {
     });
   };
 
-  const handleChange = (name: string, value: string) => {
-    setIssueData({...issueData, [name]: value});
+  const handleChange = (name, value) => {
+    setIssueData({ ...issueData, [name]: value });
     if (issueData.issueType !== '' && issueData?.issueMessage !== '') {
       setButtonShow(true);
     } else {
@@ -202,7 +203,7 @@ const Tickets: React.FC = () => {
   };
 
   //Fetch department data
-  const fetchEmployeeData = async (id: any) => {
+  const fetchEmployeeData = async id => {
     try {
       const response = await fetch(
         'https://api.reparv.in/territory-partner/tickets/employees/' + id,
@@ -240,13 +241,18 @@ const Tickets: React.FC = () => {
   };
 
   const addTicket = async () => {
+    console.log(newTicket);
+
     try {
       const response = await fetch(
         `https://api.reparv.in/territory-partner/tickets/add`,
         {
           method: 'POST',
           credentials: 'include',
-          headers: {'Content-Type': 'application/json'},
+          headers: {
+            Authorization: `Bearer ${auth?.user?.id}`, // token required for req.user.id to work
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify(newTicket),
         },
       );
@@ -268,10 +274,47 @@ const Tickets: React.FC = () => {
         details: '',
       });
     } catch (err) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error To Generate Ticket',
+      });
       console.error('Error saving employee:', err);
     } finally {
     }
   };
+  // const addTicket = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       `https://api.reparv.in/territory-partner/tickets/add`,
+  //       {
+  //         method: 'POST',
+  //         credentials: 'include',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         body: JSON.stringify(newTicket),
+  //       },
+  //     );
+
+  //     if (response.status === 409) {
+  //       Alert.alert('Ticket already exists!');
+  //     } else if (!response.ok) {
+  //       throw new Error(`Failed to save ticket. Status: ${response.status}`);
+  //     } else {
+  //       handleData();
+  //     }
+
+  //     // Clear form only after successful fetch
+  //     setNewTicketData({
+  //       adminid: '',
+  //       departmentid: '',
+  //       employeeid: '',
+  //       issue: '',
+  //       details: '',
+  //     });
+  //   } catch (err) {
+  //     console.error('Error saving employee:', err);
+  //   } finally {
+  //   }
+  // };
 
   useFocusEffect(
     useCallback(() => {
@@ -296,14 +339,16 @@ const Tickets: React.FC = () => {
         flex: 1,
         width: '100%',
         backgroundColor: 'white',
-      }}>
+      }}
+    >
       {mainScreen && (
         <View
           style={{
             flex: 2,
             width: '100%',
             backgroundColor: 'white',
-          }}>
+          }}
+        >
           {/* Button to open the drawer */}
           <TouchableOpacity style={styles.button} onPress={openDrawer}>
             <View style={styles.innerContainer}>
@@ -326,33 +371,35 @@ const Tickets: React.FC = () => {
               flex: 2,
               marginTop: 50,
               gap: 20,
-            }}>
+            }}
+          >
             <ScrollView>
-              {tickets?.map((d, i) => (
-                <TicketCard
-                  key={i}
-                  issue={d.issue}
-                  status={d.status}
-                  ticketNo={d.ticketno}
-                  adminName={d.admin_name}
-                  employee={d.employee_name}
-                  department={d.department}
-                  adminid={d.adminid}
-                  departmentid={d.departmentid}
-                  employeeid={d.employeeid}
-                  time={`Posted at ${d.created_at || 'Unknown time'}`}
-                  ticket={d.ticketno}
-                  ticketDes={d.details}
-                  ticketId={d.ticketid}
-                  newTicket={
-                    (newTicket.adminid,
-                    newTicket.departmentid,
-                    newTicket.employeeid,
-                    newTicket.issue,
-                    newTicket.details)
-                  }
-                />
-              ))}
+              {Array.isArray(tickets) &&
+                tickets.map((d, i) => (
+                  <TicketCard
+                    key={i}
+                    issue={d.issue}
+                    status={d.status}
+                    ticketNo={d.ticketno}
+                    adminName={d.admin_name}
+                    employee={d.employee_name}
+                    department={d.department}
+                    adminid={d.adminid}
+                    departmentid={d.departmentid}
+                    employeeid={d.employeeid}
+                    time={`Posted at ${d.created_at || 'Unknown time'}`}
+                    ticket={d.ticketno}
+                    ticketDes={d.details}
+                    ticketId={d.ticketid}
+                    newTicket={{
+                      adminid: newTicket.adminid,
+                      departmentid: newTicket.departmentid,
+                      employeeid: newTicket.employeeid,
+                      issue: newTicket.issue,
+                      details: newTicket.details,
+                    }}
+                  />
+                ))}
             </ScrollView>
           </View>
         </View>
@@ -365,18 +412,21 @@ const Tickets: React.FC = () => {
             {/* Drawer content */}
             <KeyboardAvoidingView
               behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-              style={styles.drawerContent}>
+              style={styles.drawerContent}
+            >
               <View
                 style={{
                   flexDirection: 'row',
                   width: '100%',
                   justifyContent: 'space-between',
-                }}>
+                }}
+              >
                 <View
                   style={{
                     flexDirection: 'column',
                     gap: 5,
-                  }}>
+                  }}
+                >
                   <Text style={styles.title}>Create Quick Ticket</Text>
                   <Text style={styles.description}>
                     Write and address new queries and issues
@@ -398,7 +448,8 @@ const Tickets: React.FC = () => {
                   marginTop: 10,
                   color: '#00000066',
                   fontWeight: '500',
-                }}>
+                }}
+              >
                 Issue Category
               </Text>
 
@@ -408,20 +459,21 @@ const Tickets: React.FC = () => {
                 selectedValue={selectedValue || newTicket.issue || ''}
                 onValueChange={value => {
                   setSelectedValue(value);
-                  setNewTicketData({...newTicket, issue: value});
+                  setNewTicketData({ ...newTicket, issue: value });
                   handleChange('issueType', value);
                 }}
                 options={options}
                 mytype={false}
               />
 
-              <View style={{width: '100%', marginTop: 10}}>
+              <View style={{ width: '100%', marginTop: 10 }}>
                 <Text
                   style={{
                     fontSize: 14,
                     color: '#00000066',
                     fontWeight: '500',
-                  }}>
+                  }}
+                >
                   Select Admin
                 </Text>
 
@@ -433,19 +485,21 @@ const Tickets: React.FC = () => {
                     // marginTop: 10,
                     backgroundColor:
                       newTicket.departmentid === '' ? '#f2f2f2' : '#fff',
-                  }}>
+                  }}
+                >
                   <Picker
                     selectedValue={newTicket.adminid}
                     // enabled={newTicket.departmentid !== ''}
                     onValueChange={itemValue =>
-                      setNewTicketData({...newTicket, adminid: itemValue})
+                      setNewTicketData({ ...newTicket, adminid: itemValue })
                     }
                     style={{
                       fontSize: 16,
                       //  paddingVertical: 5,
                       // paddingHorizontal: 8,
                       color: '#000',
-                    }}>
+                    }}
+                  >
                     <Picker.Item label="Select Admin" value="" />
                     {adminData?.map((admin, index) => (
                       <Picker.Item
@@ -458,14 +512,15 @@ const Tickets: React.FC = () => {
                 </View>
               </View>
 
-              <View style={{width: '100%', marginTop: 10}}>
+              <View style={{ width: '100%', marginTop: 10 }}>
                 <Text
                   style={{
                     fontSize: 14,
                     // lineHeight: 18,
                     color: '#00000066',
                     fontWeight: '500',
-                  }}>
+                  }}
+                >
                   Department
                 </Text>
 
@@ -479,19 +534,24 @@ const Tickets: React.FC = () => {
                     borderRadius: 4,
                     backgroundColor:
                       newTicket.adminid !== '' ? '#f0f0f0' : 'transparent',
-                  }}>
+                  }}
+                >
                   <Picker
                     enabled={newTicket.adminid === ''}
                     selectedValue={newTicket.departmentid}
                     onValueChange={itemValue =>
-                      setNewTicketData({...newTicket, departmentid: itemValue})
+                      setNewTicketData({
+                        ...newTicket,
+                        departmentid: itemValue,
+                      })
                     }
                     style={{
                       fontSize: 16,
                       fontWeight: '500',
                       color: '#000',
                       backgroundColor: 'transparent',
-                    }}>
+                    }}
+                  >
                     <Picker.Item label="Select Department" value="" />
                     {departmentData?.map((department, index) => (
                       <Picker.Item
@@ -504,14 +564,15 @@ const Tickets: React.FC = () => {
                 </View>
               </View>
 
-              <View style={{width: '100%'}}>
+              <View style={{ width: '100%' }}>
                 <Text
                   style={{
                     fontSize: 14,
                     lineHeight: 18,
                     color: '#00000066',
                     fontWeight: '500',
-                  }}>
+                  }}
+                >
                   Employee
                 </Text>
 
@@ -525,19 +586,21 @@ const Tickets: React.FC = () => {
                     borderRadius: 4,
                     backgroundColor:
                       newTicket.departmentid === '' ? '#f0f0f0' : 'transparent',
-                  }}>
+                  }}
+                >
                   <Picker
                     enabled={newTicket.departmentid !== ''}
                     selectedValue={newTicket.employeeid}
                     onValueChange={itemValue =>
-                      setNewTicketData({...newTicket, employeeid: itemValue})
+                      setNewTicketData({ ...newTicket, employeeid: itemValue })
                     }
                     style={{
                       fontSize: 16,
                       fontWeight: '500',
                       color: '#000',
                       backgroundColor: 'transparent',
-                    }}>
+                    }}
+                  >
                     <Picker.Item label="Select Employee" value="" />
                     {employeeData?.map((employee, index) => (
                       <Picker.Item
@@ -552,30 +615,32 @@ const Tickets: React.FC = () => {
               {/* </View> */}
               <Text style={styles.label}>Ticket Description:</Text>
               <TextInput
-                style={[styles.textInput, {color: 'black'}]}
+                style={[styles.textInput, { color: 'black' }]}
                 placeholder={!isFocused ? 'Type ticket issue here..?' : ''}
                 placeholderTextColor="gray"
                 // value={ticketDes}
                 // onFocus={() => setIsFocused(true)}
                 // onBlur={() => setIsFocused(false)}
                 onChangeText={value =>
-                  setNewTicketData({...newTicket, details: value})
+                  setNewTicketData({ ...newTicket, details: value })
                 }
                 multiline
               />
               <TouchableOpacity
                 // disabled={!buttonShow}
                 onPress={addTicket}
-                style={[styles.saveButton, {backgroundColor: '#0078DB'}]}>
+                style={[styles.saveButton, { backgroundColor: '#0078DB' }]}
+              >
                 <Text
                   style={[
                     styles.saveButtonText,
-                    {color: `${!buttonShow ? 'white' : 'gray'}`},
-                  ]}>
+                    { color: `${!buttonShow ? 'white' : 'gray'}` },
+                  ]}
+                >
                   Save
                 </Text>
               </TouchableOpacity>
-              <View style={{padding: 20}}></View>
+              <View style={{ padding: 20 }}></View>
             </KeyboardAvoidingView>
           </Animated.View>
         </TouchableOpacity>
@@ -609,6 +674,8 @@ const Tickets: React.FC = () => {
           </Text>
         </View>
       )}
+
+      <Toast />
     </View>
   );
 };
@@ -772,7 +839,7 @@ const Successtyles = StyleSheet.create({
     height: 279,
 
     top: '40%',
-    transform: [{translateY: -279 / 2 - 0.5}],
+    transform: [{ translateY: -279 / 2 - 0.5 }],
     justifyContent: 'center',
     alignItems: 'center',
   },

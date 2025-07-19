@@ -1,5 +1,3 @@
-
-
 import React, { useState, useMemo, useContext } from 'react';
 import {
   View,
@@ -44,8 +42,7 @@ const shortcuts = [
   { label: 'Set up', getValue: () => [new Date(), new Date()] },
 ];
 
-const formatDate = (d) => format(d, 'dd/MM/yyyy');
-
+const formatDate = d => format(d, 'dd/MM/yyyy');
 
 const EnquiryCustomeDatePicker = () => {
   const [visible, setVisible] = useState(false);
@@ -62,11 +59,7 @@ const EnquiryCustomeDatePicker = () => {
     const start = new Date(startDate);
     const end = endDate ? new Date(endDate) : start;
 
-    for (
-      let d = new Date(start);
-      d <= end;
-      d.setDate(d.getDate() + 1)
-    ) {
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       const key = format(d, 'yyyy-MM-dd');
       dates[key] = {
         color: '#16a34a',
@@ -78,48 +71,40 @@ const EnquiryCustomeDatePicker = () => {
     return dates;
   }, [range]);
 
-  const auth=useContext(AuthContext)
+  const auth = useContext(AuthContext);
 
+  const onDaySelect = day => {
+    const date = day.dateString; // Format: 'yyyy-MM-dd'
+    const { startDate, endDate } = range;
 
-   const onDaySelect = (day) => {
-  const date = day.dateString; // Format: 'yyyy-MM-dd'
-  const { startDate, endDate } = range;
-
-
- 
-  if (!startDate || (startDate && endDate)) {
-    // First tap OR restarting the range
-    setRange({ startDate: date, endDate: null });
-    auth?.setDateRange({ startDate: date, endDate: date });
-
-  } else {
-    
-    // Second tap
-    if (date < startDate) {
-      // Tapped before start -> swap
-      setRange({ startDate: date, endDate: startDate });
-      auth?.setDateRange({ startDate: date, endDate: startDate });
+    if (!startDate || (startDate && endDate)) {
+      // First tap OR restarting the range
+      setRange({ startDate: date, endDate: null });
+      auth?.setDateRange({ startDate: date, endDate: date });
     } else {
-      // Normal range
-      setRange({ startDate, endDate: date });
-      auth?.setDateRange({ startDate, endDate: date }); // ✅ This was missing
+      // Second tap
+      if (date < startDate) {
+        // Tapped before start -> swap
+        setRange({ startDate: date, endDate: startDate });
+        auth?.setDateRange({ startDate: date, endDate: startDate });
+      } else {
+        // Normal range
+        setRange({ startDate, endDate: date });
+        auth?.setDateRange({ startDate, endDate: date }); // ✅ This was missing
+      }
     }
-  }
-};
+  };
 
-   
-
-  const applyShortcut = (sc) => {
-    const [start, end] = sc.getValue().map((d) => format(d, 'yyyy-MM-dd'));
+  const applyShortcut = sc => {
+    const [start, end] = sc.getValue().map(d => format(d, 'yyyy-MM-dd'));
     setRange({ startDate: start, endDate: end });
-    auth?.setDateRange({ startDate: start, endDate: end })
+    auth?.setDateRange({ startDate: start, endDate: end });
     setSelectedShortcut(sc.label);
   };
 
- 
   const reset = () => {
     setRange({ startDate: null, endDate: null });
-auth?.setDateRange({ startDate: null, endDate: null })
+    auth?.setDateRange({ startDate: null, endDate: null });
     setSelectedShortcut(null);
   };
 
@@ -130,7 +115,7 @@ auth?.setDateRange({ startDate: null, endDate: null })
         )}`
       : 'Select Date Range';
 
-//console.log(auth?.dateRange,'dd');
+  //console.log(auth?.dateRange,'dd');
 
   return (
     <View style={styles.container}>
@@ -146,7 +131,7 @@ auth?.setDateRange({ startDate: null, endDate: null })
           source={require('../assets/overview/calender.png')}
           style={styles.icon}
         /> */}
-        <Calendar1/>
+        <Calendar1 />
       </TouchableOpacity>
 
       {/* Modal with picker */}
@@ -156,7 +141,7 @@ auth?.setDateRange({ startDate: null, endDate: null })
         <View style={styles.modalContent}>
           {/* Short‑cut column */}
           <ScrollView style={styles.shortcutCol}>
-            {shortcuts.map((sc) => (
+            {shortcuts.map(sc => (
               <TouchableOpacity
                 key={sc.label}
                 style={[
@@ -172,7 +157,9 @@ auth?.setDateRange({ startDate: null, endDate: null })
                     selectedShortcut === sc.label && styles.radioOuterActive,
                   ]}
                 >
-                  {selectedShortcut === sc.label && <View style={styles.radioDot} />}
+                  {selectedShortcut === sc.label && (
+                    <View style={styles.radioDot} />
+                  )}
                 </View>
                 <Text
                   style={[
@@ -195,17 +182,19 @@ auth?.setDateRange({ startDate: null, endDate: null })
             enableSwipeMonths
           />
         </View>
- <View style={styles.footer}>
-    <TouchableOpacity onPress={() => { reset(); setVisible(false); }}>
-      <Text style={styles.cancel}>Cancel</Text>
-    </TouchableOpacity>
-    <TouchableOpacity onPress={() => setVisible(false)}>
-      <Text style={styles.apply}>Apply</Text>
-    </TouchableOpacity>
-  </View>
-      
-
-
+        <View style={styles.footer}>
+          <TouchableOpacity
+            onPress={() => {
+              reset();
+              setVisible(false);
+            }}
+          >
+            <Text style={styles.cancel}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setVisible(false)}>
+            <Text style={styles.apply}>Apply</Text>
+          </TouchableOpacity>
+        </View>
       </Modal>
     </View>
   );
@@ -221,7 +210,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   toggle: {
-  
     paddingHorizontal: 12,
     borderRadius: 8,
     borderWidth: 1,
@@ -303,29 +291,29 @@ const styles = StyleSheet.create({
   calendar: {},
 
   modalWrapper: {
-  //position: 'absolute',
-  //top: 120,
-  alignSelf: 'center',
-  width: 320,
-  backgroundColor: '#fff',
-  borderRadius: 8,
-  overflow: 'hidden',
-  elevation: 12,
-},
-modalContent: {
-  flexDirection: 'row',
-  backgroundColor: '#fff',
-},
-footer: {
-  flexDirection: 'row',
-  //justifyContent: 'flex-end',
-  paddingVertical: 12,
-  paddingHorizontal: 20,
-  borderTopWidth: 1,
-  borderColor: '#E5E7EB',
-  backgroundColor: '#fff',
-  gap: 16,
-},
+    //position: 'absolute',
+    //top: 120,
+    alignSelf: 'center',
+    width: 320,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    overflow: 'hidden',
+    elevation: 12,
+  },
+  modalContent: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+  },
+  footer: {
+    flexDirection: 'row',
+    //justifyContent: 'flex-end',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderTopWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#fff',
+    gap: 16,
+  },
 
   cancel: {
     fontSize: 14,

@@ -1,6 +1,6 @@
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {createContext, useState, ReactNode, useEffect} from 'react';
+import React, { createContext, useState, ReactNode, useEffect } from 'react';
 
 interface UserType {
   id: number;
@@ -39,7 +39,7 @@ interface AuthContextType {
   image: string | null;
   propertyinfoId: number | null;
   dateRange: DateRangeType;
-
+  propertyName: string | null;
   setUser: (user: UserType | null) => void;
   setToken: (token: string | null) => void;
   setFlatName: (flatName: string | null) => void;
@@ -50,7 +50,8 @@ interface AuthContextType {
   logout: () => void;
   setImage: (image: string | null) => void;
   setPropertyinfoId: (value: number) => void;
-   setDateRange: (range: DateRangeType) => void;
+  setDateRange: (range: DateRangeType) => void;
+  setPropertyName: (propertyName: string | null) => void;
 }
 
 // Create the context with default values (or undefined)
@@ -69,16 +70,17 @@ interface DateRangeType {
 }
 
 // Provider components
-export const AuthProvider = ({children}: AuthProviderProps) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoding, setLoading] = useState(false);
   const [token, setToken] = useState<string | null>(null);
+  const [propertyName, setPropertyName] = useState<string | null>('');
   const [user, setUser] = useState<UserType | null>(null);
   const [image, setImage] = useState<string | null>(null);
   const [flatName, setFlatName] = useState<string | null>(null);
   const [propertyinfoId, setPropertyinfoId] = useState<number | null>(null);
-const [dateRange, setDateRange] = useState<DateRangeType>({
+  const [dateRange, setDateRange] = useState<DateRangeType>({
     startDate: null,
     endDate: null,
   });
@@ -127,7 +129,8 @@ const [dateRange, setDateRange] = useState<DateRangeType>({
         setLoading,
         token,
         flatName,
-          dateRange,
+        dateRange,
+        propertyName,
         setFlatName,
         user,
         setUser,
@@ -141,8 +144,10 @@ const [dateRange, setDateRange] = useState<DateRangeType>({
         setIsPaymentSuccess,
         propertyinfoId,
         setPropertyinfoId,
-        setDateRange
-      }}>
+        setDateRange,
+        setPropertyName,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

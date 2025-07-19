@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -13,16 +13,19 @@ import {
   Alert,
 } from 'react-native';
 import BookingClientInfoCard from '../../component/BookingClientInfo';
-import {RootStackParamList} from '../../types';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {AuthContext} from '../../context/AuthContext';
+import { RootStackParamList } from '../../types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { AuthContext } from '../../context/AuthContext';
 import { MeetingFollowUp } from '../Calender';
 
 const screenHeight = Dimensions.get('window').height;
 
 const Booking: React.FC = () => {
-  type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Sign_In'>;
+  type NavigationProp = NativeStackNavigationProp<
+    RootStackParamList,
+    'Sign_In'
+  >;
   const navigation = useNavigation<NavigationProp>();
   const [showIcons, setShowIcons] = useState(true);
   const [selectedValue, setSelectedValue] = useState('visit');
@@ -58,13 +61,13 @@ const Booking: React.FC = () => {
   };
 
   const optionsR = [
-    {label: 'Pending', value: 'pending', color: '#FFCA00'},
-    {label: 'Booked', value: 'ongoing', color: '#0078DB'},
+    { label: 'Pending', value: 'pending', color: '#FFCA00' },
+    { label: 'Booked', value: 'ongoing', color: '#0078DB' },
   ];
 
   const optionsL = [
-    {label: 'Token', value: 'token', color: '#0078DB'},
-    {label: 'Cancelled', value: 'cancelled', color: '#EF4444'},
+    { label: 'Token', value: 'token', color: '#0078DB' },
+    { label: 'Cancelled', value: 'cancelled', color: '#EF4444' },
   ];
 
   const selectedColor =
@@ -83,18 +86,19 @@ const Booking: React.FC = () => {
   const renderIconBox = (icon: any, label: string, ftype: string) => (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('Flat', {flatType: ftype});
+        navigation.navigate('Flat', { flatType: ftype });
         auth?.setFlatName(ftype);
       }}
       style={[
         styles.iconBox,
-        {marginTop: label === 'Commercial Plot' ? 10 : 0},
-      ]}>
+        { marginTop: label === 'Commercial Plot' ? 10 : 0 },
+      ]}
+    >
       <Image
         source={icon}
         style={[
           styles.iconImage,
-          {marginTop: label === 'Commercial Plot' ? 2 : 0},
+          { marginTop: label === 'Commercial Plot' ? 2 : 0 },
         ]}
       />
       <Text style={styles.ilabel}>{label}</Text>
@@ -128,53 +132,53 @@ const Booking: React.FC = () => {
   );
 
   const [meeting, setMeetings] = useState<MeetingFollowUp[]>([]);
-    const [updatedMeeting, setUpdatedMeetings] = useState<MeetingFollowUp[]>([]);
-  
+  const [updatedMeeting, setUpdatedMeetings] = useState<MeetingFollowUp[]>([]);
 
-   const fetchMeetings = async () => {
-      try {
-        const response = await fetch(
-          'https://api.reparv.in/territory-partner/calender/meetings',
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${auth?.token}`,
-              // or real JWT token if using auth middleware
-            },
+  const fetchMeetings = async () => {
+    try {
+      const response = await fetch(
+        'https://api.reparv.in/territory-partner/calender/meetings',
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth?.token}`,
+            // or real JWT token if using auth middleware
           },
-        );
-  
-        const data = await response.json();
-  
-        if (!response.ok) {
-          console.error('API error:', data.message);
-          Alert.alert('Error', data.message);
-          return;
-        }
-  
-        console.log('Fetched meetings:', data);
-        setMeetings(data);
-        setUpdatedMeetings(data);
-      } catch (error) {
-        console.error('Network error:', error);
-        Alert.alert('Error', 'Failed to fetch meetings');
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('API error:', data.message);
+        Alert.alert('Error', data.message);
+        return;
       }
-    };
-  
-    useEffect(() => {
-      fetchMeetings();
-      // const interval = setInterval(fetchMeetings, 30000); //tch every 30s
-      // return () => clearInterval(interval); // cleanup on unmount
-    }, []);
-  
+
+      console.log('Fetched meetings:', data);
+      setMeetings(data);
+      setUpdatedMeetings(data);
+    } catch (error) {
+      console.error('Network error:', error);
+      Alert.alert('Error', 'Failed to fetch meetings');
+    }
+  };
+
+  useEffect(() => {
+    fetchMeetings();
+    // const interval = setInterval(fetchMeetings, 30000); //tch every 30s
+    // return () => clearInterval(interval); // cleanup on unmount
+  }, []);
+
   return (
     <View style={styles.screen}>
       {/* Top Icons Section */}
       <Animated.View
         style={{
           display: `${showIcons ? 'flex' : 'none'}`,
-        }}>
+        }}
+      >
         <View style={styles.container}>
           <View style={styles.Iconcontainer}>
             <View style={styles.row1}>
@@ -269,16 +273,13 @@ const Booking: React.FC = () => {
       {/* Customer Section */}
       <Animated.View style={styles.frame}>
         <Text style={styles.customerText}>Customer</Text>
-     
       </Animated.View>
 
       {/* Client Info Cards */}
-      <ScrollView style={{marginTop: 0}} onScroll={handleCardScroll}>
+      <ScrollView style={{ marginTop: 0 }} onScroll={handleCardScroll}>
         <View>
           {meeting &&
-            meeting.map((d, i) => (
-              <BookingClientInfoCard key={i} data={d} />
-            ))}
+            meeting.map((d, i) => <BookingClientInfoCard key={i} data={d} />)}
           {meeting.length === 0 && (
             <Text
               style={{
@@ -286,8 +287,9 @@ const Booking: React.FC = () => {
                 alignContent: 'center',
                 justifyContent: 'center',
                 marginTop: 50,
-                color:'black'
-              }}>
+                color: 'black',
+              }}
+            >
               Not Found Any Booking Records.
             </Text>
           )}
@@ -306,20 +308,22 @@ const Booking: React.FC = () => {
                 key={i}
                 data={list}
                 keyExtractor={item => item.value}
-                renderItem={({item}) => (
+                renderItem={({ item }) => (
                   <TouchableOpacity
                     style={styles.option}
-                    onPress={() => handleSelect(item.value)}>
+                    onPress={() => handleSelect(item.value)}
+                  >
                     <View
                       style={[
                         styles.checkbox,
                         selectedValue === item.value && styles.checked,
-                      ]}>
+                      ]}
+                    >
                       {selectedValue === item.value && (
                         <Text style={styles.checkmark}>✓</Text>
                       )}
                     </View>
-                    <Text style={[styles.optionText, {color: item.color}]}>
+                    <Text style={[styles.optionText, { color: item.color }]}>
                       {item.label}
                     </Text>
                   </TouchableOpacity>
@@ -401,7 +405,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 14,
     shadowColor: '#000',
-    shadowOffset: {width: 10, height: 0},
+    shadowOffset: { width: 10, height: 0 },
     shadowOpacity: 0.65,
     shadowRadius: 1,
     elevation: 1,

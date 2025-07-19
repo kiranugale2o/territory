@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,14 +10,14 @@ import {
   Button,
   Alert,
 } from 'react-native';
-import {RootStackParamList} from '../types';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useNavigation} from '@react-navigation/native';
+import { RootStackParamList } from '../types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
-import {toastConfig} from '../utils';
+import { toastConfig } from '../utils';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const ForgotPassword = () => {
   type NavigationProp = NativeStackNavigationProp<
@@ -33,7 +33,7 @@ const ForgotPassword = () => {
         `https://api.reparv.in/territoryapp/client/send-otp/${email}`,
         {
           method: 'GET',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
         },
       );
 
@@ -75,7 +75,8 @@ const ForgotPassword = () => {
         flex: 1,
         backgroundColor: 'white',
         justifyContent: 'space-between',
-      }}>
+      }}
+    >
       <View style={styles.container}>
         <Text style={styles.heading}>Forgot password</Text>
         <Text style={styles.subheading}>
@@ -100,7 +101,8 @@ const ForgotPassword = () => {
         style={styles.button}
         onPress={async () => {
           sendOtp();
-        }}>
+        }}
+      >
         <Text style={styles.buttonText}>Reset Password</Text>
       </TouchableOpacity>
       <Toast config={toastConfig} />

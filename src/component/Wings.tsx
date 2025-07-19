@@ -1,5 +1,5 @@
-import {X} from 'lucide-react-native';
-import React, {useContext, useEffect, useState} from 'react';
+import { X } from 'lucide-react-native';
+import React, { useContext, useEffect, useState } from 'react';
 
 import {
   View,
@@ -13,13 +13,13 @@ import {
   Alert,
 } from 'react-native';
 import ConfirmBookingPopup from './ConfirmBookingPopup';
-import {payNow} from '../utils/razorpay';
-import {AuthContext} from '../context/AuthContext';
+import { payNow } from '../utils/razorpay';
+import { AuthContext } from '../context/AuthContext';
 import Toast from 'react-native-toast-message';
 import SuccessModal from './PaymentModules/SuccessModel';
-import {PropertyInfo} from '../types';
+import { PropertyInfo } from '../types';
 import WingsFlatsList from './wingList';
-import {wdata} from '../utils';
+import { wdata } from '../utils';
 import axios from 'axios';
 import Loader from './loader';
 
@@ -58,7 +58,7 @@ interface Props {
   sid: number;
 }
 
-const Wings: React.FC<Props> = ({pdata, eid, sid}) => {
+const Wings: React.FC<Props> = ({ pdata, eid, sid }) => {
   const [selectedRoom, setSelectedRoom] = useState<{
     wing: string;
     room: string;
@@ -111,11 +111,11 @@ const Wings: React.FC<Props> = ({pdata, eid, sid}) => {
     if (pdata?.propertyid) fetchProperty();
   }, [pdata?.propertyid]);
 
-  if (!property) return <Text style={{color:'black'}}>Wings Not Found !</Text>;
+  if (!property)
+    return <Text style={{ color: 'black' }}>Wings Not Found !</Text>;
 
   return (
     <>
-     
       <WingsFlatsList
         data={property}
         sid={sid}

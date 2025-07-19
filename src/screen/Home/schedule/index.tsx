@@ -1,5 +1,5 @@
-import {RouteProp, useRoute} from '@react-navigation/native';
-import React, {useContext, useEffect, useState} from 'react';
+import { RouteProp, useRoute } from '@react-navigation/native';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,13 +8,18 @@ import {
   ScrollView,
 } from 'react-native';
 
-import Svg, {ClipPath, Defs, G, Path, Rect} from 'react-native-svg';
-import {Enquiry, RootStackParamList, SalesPerson} from '../../../types';
-import {AuthContext} from '../../../context/AuthContext';
+import Svg, { ClipPath, Defs, G, Path, Rect } from 'react-native-svg';
+import {
+  Enquiry,
+  PropertyInfo,
+  RootStackParamList,
+  SalesPerson,
+} from '../../../types';
+import { AuthContext } from '../../../context/AuthContext';
 import Loader from '../../../component/loader';
-import {formatUpdatedAt, toastConfig} from '../../../utils';
+import { formatUpdatedAt, toastConfig } from '../../../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {HandCoins, Loader2} from 'lucide-react-native';
+import { HandCoins, Loader2 } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 import { formatIndianAmount } from '../../..';
 
@@ -44,10 +49,8 @@ const Schedule: React.FC = () => {
       }
 
       const data = await response.json();
-         console.log(data,'ss');
+      console.log(data, 'ss');
       setEnquiries(data);
-   
-      
     } catch (error) {
       console.error('API call failed:', error);
     } finally {
@@ -70,14 +73,16 @@ const Schedule: React.FC = () => {
 
         backgroundColor: 'white',
         flexDirection: 'column',
-      }}>
+      }}
+    >
       <View style={{}}>
         <ScrollView
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.sliderContainer}
-          style={{marginTop: 20}}>
+          style={{ marginTop: 20 }}
+        >
           {enquiries !== null &&
             enquiries
               ?.slice()
@@ -93,7 +98,7 @@ const Schedule: React.FC = () => {
       </View>
 
       <Text style={styles.headerText}>Visit Scheduleds</Text>
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         <ScrollView>
           {enquiries !== null &&
             enquiries.map((d, i) => (
@@ -107,9 +112,9 @@ const Schedule: React.FC = () => {
 
 export default Schedule;
 
-const VisitCard: React.FC<Props> = ({enquiry}) => {
+const VisitCard: React.FC<Props> = ({ enquiry }) => {
   const [data, setData] = useState<SalesPerson | null>(null);
-  const [property, setProperty] = useState(null);
+  const [property, setProperty] = useState<PropertyInfo | null>(null);
   const getProfile = async () => {
     try {
       const response = await fetch(
@@ -124,7 +129,6 @@ const VisitCard: React.FC<Props> = ({enquiry}) => {
       );
 
       const data = await response.json();
-  
 
       setData(data);
       // navigation.navigate("")
@@ -132,7 +136,7 @@ const VisitCard: React.FC<Props> = ({enquiry}) => {
       console.error('Error updating user:', error);
     }
   };
-  const {relative, fullDate, timeOnly} = formatUpdatedAt(enquiry.updated_at);
+  const { relative, fullDate, timeOnly } = formatUpdatedAt(enquiry.updated_at);
 
   const fetchProperty = async () => {
     try {
@@ -143,7 +147,7 @@ const VisitCard: React.FC<Props> = ({enquiry}) => {
       const data = await res.json();
       //console.log(data,"peeee");
 
-      setProperty(data,"fff");
+      setProperty(data, 'fff');
     } catch (error) {
       console.error('Error fetching property:', error);
     }
@@ -155,20 +159,31 @@ const VisitCard: React.FC<Props> = ({enquiry}) => {
   }, []);
   return (
     <View style={styles.wrapper}>
-      <View style={[{ position: 'absolute',
-    width: 27,
-    height: 129,
+      <View
+        style={[
+          {
+            position: 'absolute',
+            width: 27,
+            height: 129,
 
-   
-    borderRadius: 8,},getStatusStyle(enquiry?.status)]} />
+            borderRadius: 8,
+          },
+          getStatusStyle(enquiry?.status),
+        ]}
+      />
 
-      
       <View style={styles.card}>
         <View style={styles.titleSection}>
-         <Text style={[styles.title,getStatusStyleText(enquiry?.status),{backgroundColor:'white'}]}>
-  {enquiry?.status}
-</Text>
-      <Text style={styles.subtitle}>
+          <Text
+            style={[
+              styles.title,
+              getStatusStyleText(enquiry?.status),
+              { backgroundColor: 'white' },
+            ]}
+          >
+            {enquiry?.status}
+          </Text>
+          <Text style={styles.subtitle}>
             Site Visit with
             {' ' + data?.fullname}
           </Text>
@@ -279,9 +294,6 @@ const getStatusStyleText = (status: string) => {
   }
 };
 
-
-
-
 const styles = StyleSheet.create({
   headerText: {
     margin: 'auto',
@@ -302,7 +314,6 @@ const styles = StyleSheet.create({
     width: 27,
     height: 129,
 
-   
     borderRadius: 8,
   },
   card: {
@@ -373,9 +384,9 @@ const styles = StyleSheet.create({
 interface Props {
   enquiry: Enquiry;
 }
-const StatusCard: React.FC<Props> = ({enquiry}) => {
+const StatusCard: React.FC<Props> = ({ enquiry }) => {
   const [data, setData] = useState<SalesPerson | null>(null);
-  const [property, setProperty] = useState(null);
+  const [property, setProperty] = useState<PropertyInfo| null>(null);
   const getProfile = async (id: any) => {
     try {
       const response = await fetch(
@@ -390,10 +401,9 @@ const StatusCard: React.FC<Props> = ({enquiry}) => {
       );
 
       const data = await response.json();
-     
+
       setData(data);
-    
-      
+
       // navigation.navigate("")
     } catch (error) {
       console.error('Error updating user:', error);
@@ -407,19 +417,19 @@ const StatusCard: React.FC<Props> = ({enquiry}) => {
       );
       if (!res.ok) throw new Error('Network response was not ok');
       const data = await res.json();
-     
+
       setProperty(data);
     } catch (error) {
       console.error('Error fetching property:', error);
     }
   };
 
-  const {relative, fullDate, timeOnly} = formatUpdatedAt(enquiry.updated_at);
+  const { relative, fullDate, timeOnly } = formatUpdatedAt(enquiry.updated_at);
   useEffect(() => {
     getProfile(enquiry?.enquirersid);
     fetchProperty();
   }, []);
- 
+
   getProfile(enquiry?.enquirersid);
   const acceptEnquiry = async () => {
     try {
@@ -585,13 +595,16 @@ const StatusCard: React.FC<Props> = ({enquiry}) => {
           </Text>
         </View>
 
-          <View style={Statusstyles.row}>
+        <View style={Statusstyles.row}>
           <View style={Statusstyles.iconText}>
-         <HandCoins strokeWidth={0.5} color={'gray'} />
+            <HandCoins strokeWidth={0.5} color={'gray'} />
 
-            <Text style={[Statusstyles.label,{fontSize:14}]}>Commission Amount:</Text>
+            <Text style={[Statusstyles.label, { fontSize: 14 }]}>
+              Commission Amount:
+            </Text>
           </View>
-          <Text style={Statusstyles.value}>₹{formatIndianAmount(enquiry?.commissionAmount * 0.2)}
+          <Text style={Statusstyles.value}>
+            ₹{formatIndianAmount(enquiry?.commissionAmount * 0.2)}
           </Text>
         </View>
       </View>
@@ -600,12 +613,14 @@ const StatusCard: React.FC<Props> = ({enquiry}) => {
       <View style={Statusstyles.buttonContainer}>
         <TouchableOpacity
           style={Statusstyles.declineButton}
-          onPress={rejectEnquiry}>
+          onPress={rejectEnquiry}
+        >
           <Text style={Statusstyles.declineText}>Reject</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={Statusstyles.acceptButton}
-          onPress={acceptEnquiry}>
+          onPress={acceptEnquiry}
+        >
           <Text style={Statusstyles.acceptText}>Accept</Text>
         </TouchableOpacity>
       </View>

@@ -1,6 +1,6 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import Svg, {Path} from 'react-native-svg';
+import { View, Text, StyleSheet } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
 type StatusType = 'Accepted' | 'Declined' | 'Pending';
 
@@ -13,12 +13,14 @@ interface MeetingCardProps {
   person: string;
 }
 
-const statusStyles: Record<StatusType, {textColor: string; dotColor: string}> =
-  {
-    Accepted: {textColor: '#0078DB', dotColor: '#21BE79'},
-    Declined: {textColor: '#FF3B30', dotColor: '#FF3B30'},
-    Pending: {textColor: '#FFC107', dotColor: '#FFC107'},
-  };
+const statusStyles: Record<
+  StatusType,
+  { textColor: string; dotColor: string }
+> = {
+  Accepted: { textColor: '#0078DB', dotColor: '#21BE79' },
+  Declined: { textColor: '#FF3B30', dotColor: '#FF3B30' },
+  Pending: { textColor: '#FFC107', dotColor: '#FFC107' },
+};
 
 const MeetingCard: React.FC<MeetingCardProps> = ({
   status,
@@ -28,7 +30,7 @@ const MeetingCard: React.FC<MeetingCardProps> = ({
   location,
   person,
 }) => {
-  const {textColor, dotColor} = statusStyles[status];
+  const { textColor, dotColor } = statusStyles[status];
 
   return (
     <View style={styles.container}>
@@ -64,7 +66,7 @@ const MeetingCard: React.FC<MeetingCardProps> = ({
             )}
           </View>
           <View style={styles.statusText}>
-            <Text style={[styles.status, {color: textColor}]}>
+            <Text style={[styles.status, { color: textColor }]}>
               Request {status}
             </Text>
             <Text style={[styles.timeAgo]}>{timeAgo}</Text>

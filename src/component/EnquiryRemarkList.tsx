@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, TextInput} from 'react-native';
+import { View, Text, TextInput } from 'react-native';
 interface Remark {
   followupid: number;
   enquirerid: number;
@@ -19,31 +19,38 @@ interface Props {
 }
 export const getStatusStyle = (
   status: string,
-): {backgroundColor?: string; color: string} => {
+): { backgroundColor?: string; color: string } => {
   switch (status) {
     case 'New':
-      return {backgroundColor: '#EAFBF1', color: '#0078DB'};
+      return { backgroundColor: '#EAFBF1', color: '#0078DB' };
     case 'Visit Scheduled':
-      return {backgroundColor: '#E9F2FF', color: '#0068FF'};
+      return { backgroundColor: '#E9F2FF', color: '#0068FF' };
     case 'Token':
-      return {backgroundColor: '#FFF8DD', color: '#FFCA00'};
+      return { backgroundColor: '#FFF8DD', color: '#FFCA00' };
     case 'Cancelled':
-      return {backgroundColor: '#FFEAEA', color: '#ff2323'};
+      return { backgroundColor: '#FFEAEA', color: '#ff2323' };
     case 'Follow Up':
-      return {backgroundColor: '#F4F0FB', color: '#5D00FF'};
+      return { backgroundColor: '#F4F0FB', color: '#5D00FF' };
     default:
-      return {color: '#000000'};
+      return { color: '#000000' };
   }
 };
 
-const EnquiryRemarkList: React.FC<Props> = ({remarkList}) => {
+const EnquiryRemarkList: React.FC<Props> = ({ remarkList }) => {
   return (
-    <View style={{width: '100%'}}>
-      <Text style={{fontWeight: '600', fontSize: 16, marginTop: 24}}>
+    <View style={{ width: '100%' }}>
+      <Text
+        style={{
+          fontWeight: '600',
+          fontSize: 16,
+          marginTop: 24,
+          color: 'black',
+        }}
+      >
         Enquiry Remark List
       </Text>
 
-      <View style={{marginTop: 8, flexDirection: 'column'}}>
+      <View style={{ marginTop: 8, flexDirection: 'column' }}>
         {remarkList.length > 0 ? (
           remarkList.map((remark, index) => {
             const statusStyle = getStatusStyle(remark.status);
@@ -57,14 +64,15 @@ const EnquiryRemarkList: React.FC<Props> = ({remarkList}) => {
             );
 
             return (
-              <View key={index} style={{width: '100%', marginTop: 16}}>
+              <View key={index} style={{ width: '100%', marginTop: 16 }}>
                 <Text
                   style={{
                     fontSize: 14,
                     // fontWeight: '500',
                     color: '#00000066',
                     marginBottom: 4,
-                  }}>
+                  }}
+                >
                   <Text
                     style={{
                       paddingHorizontal: 8,
@@ -72,7 +80,8 @@ const EnquiryRemarkList: React.FC<Props> = ({remarkList}) => {
                       borderRadius: 6,
                       backgroundColor: statusStyle.backgroundColor,
                       color: statusStyle.color,
-                    }}>
+                    }}
+                  >
                     {date} - {remark.status}
                   </Text>
                 </Text>
@@ -86,7 +95,8 @@ const EnquiryRemarkList: React.FC<Props> = ({remarkList}) => {
                       width: 'auto',
                       padding: 15,
                     },
-                  ]}>
+                  ]}
+                >
                   <Text
                     style={[
                       {
@@ -95,7 +105,8 @@ const EnquiryRemarkList: React.FC<Props> = ({remarkList}) => {
                         color: `#0078DB`,
                         width: '100%',
                       },
-                    ]}>
+                    ]}
+                  >
                     {remark.remark}
                   </Text>
                 </View>
@@ -112,7 +123,8 @@ const EnquiryRemarkList: React.FC<Props> = ({remarkList}) => {
                 width: 'auto',
                 padding: 15,
               },
-            ]}>
+            ]}
+          >
             <Text
               style={[
                 {
@@ -121,7 +133,8 @@ const EnquiryRemarkList: React.FC<Props> = ({remarkList}) => {
                   color: `#0078DB`,
                   width: '100%',
                 },
-              ]}>
+              ]}
+            >
               No Remark Found
             </Text>
           </View>

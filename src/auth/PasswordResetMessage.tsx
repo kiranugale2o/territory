@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,12 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import {RootStackParamList} from '../types';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useNavigation} from '@react-navigation/native';
+import { RootStackParamList } from '../types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const PasswordResetMessage = async () => {
   type NavigationProp = NativeStackNavigationProp<
@@ -27,7 +27,8 @@ const PasswordResetMessage = async () => {
         flex: 1,
         backgroundColor: 'white',
         justifyContent: 'space-between',
-      }}>
+      }}
+    >
       <View style={styles.container}>
         {/* Title */}
         <Text style={styles.title}>Password reset</Text>
@@ -43,7 +44,8 @@ const PasswordResetMessage = async () => {
         style={styles.button}
         onPress={() => {
           navigation.navigate('SetNewPassword');
-        }}>
+        }}
+      >
         <Text style={styles.buttonText}>Confirm</Text>
       </TouchableOpacity>
     </View>

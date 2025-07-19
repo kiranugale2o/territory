@@ -7,9 +7,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {calanderOprtions, formatDateToShort} from '../utils';
-import Svg, {Path} from 'react-native-svg';
-import {useState} from 'react';
+import { calanderOprtions, formatDateToShort } from '../utils';
+import Svg, { Path } from 'react-native-svg';
+import { useState } from 'react';
 import Toast from 'react-native-toast-message';
 
 interface MeetingFollowUp {
@@ -23,7 +23,7 @@ interface MeetingFollowUp {
   contact: string;
   fullname: string;
 }
-const CalanderCard = ({d}: {d: MeetingFollowUp}) => {
+const CalanderCard = ({ d }: { d: MeetingFollowUp }) => {
   const [visible, setVisible] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string>(d.status);
   const selected = !calanderOprtions.find(opt => opt.value === selectedValue)
@@ -48,7 +48,7 @@ const CalanderCard = ({d}: {d: MeetingFollowUp}) => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({status: value}),
+          body: JSON.stringify({ status: value }),
         },
       );
 
@@ -101,14 +101,16 @@ const CalanderCard = ({d}: {d: MeetingFollowUp}) => {
             justifyContent: 'space-between',
             width: '100%',
           },
-        ]}>
-        <View style={[styles.column, {width: '40%'}]}>
+        ]}
+      >
+        <View style={[styles.column, { width: '40%' }]}>
           <Text style={styles.label}>Number</Text>
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(`tel:${d.contact}`);
             }}
-            style={[styles.phoneRow, {width: 290}]}>
+            style={[styles.phoneRow, { width: 290 }]}
+          >
             <Svg width="16" height="17" viewBox="0 0 16 17" fill="none">
               <Path
                 d="M11.1616 10.7645L10.7571 11.1909C10.7571 11.1909 9.79447 12.2036 7.16782 9.43841C4.54117 6.67321 5.50384 5.66049 5.50384 5.66049L5.75806 5.39131C6.3865 4.7306 6.44605 3.66895 5.89761 2.89341L4.77762 1.3094C4.09851 0.349391 2.78741 0.222331 2.00964 1.04116L0.61409 2.50941C0.229204 2.916 -0.0285723 3.44118 0.00253865 4.02471C0.0825381 5.51837 0.720756 8.73064 4.27984 12.4784C8.05493 16.4521 11.5971 16.6102 13.0451 16.4672C13.5038 16.422 13.902 16.1754 14.2229 15.8366L15.4851 14.5076C16.3384 13.6107 16.0984 12.0718 15.0069 11.4441L13.3091 10.4662C12.5927 10.0549 11.7216 10.1754 11.1616 10.7645Z"
@@ -128,7 +130,8 @@ const CalanderCard = ({d}: {d: MeetingFollowUp}) => {
           <TouchableOpacity
             onPress={() => {
               setVisible(true);
-            }}>
+            }}
+          >
             <Text style={styles.label}>Status</Text>
             <View
               style={[
@@ -138,14 +141,16 @@ const CalanderCard = ({d}: {d: MeetingFollowUp}) => {
                   borderRadius: 20,
                   marginTop: 5,
                 },
-              ]}>
+              ]}
+            >
               <Text
                 style={[
                   styles.label,
                   {
                     color: `${selectColor}`,
                   },
-                ]}>
+                ]}
+              >
                 {selectedLabel}
               </Text>
             </View>
@@ -164,20 +169,22 @@ const CalanderCard = ({d}: {d: MeetingFollowUp}) => {
                 key={i}
                 data={list}
                 keyExtractor={item => item.value}
-                renderItem={({item}) => (
+                renderItem={({ item }) => (
                   <TouchableOpacity
                     style={styles.option}
-                    onPress={() => handleSelect(item.value)}>
+                    onPress={() => handleSelect(item.value)}
+                  >
                     <View
                       style={[
                         styles.checkbox,
                         selectedValue === item.value && styles.checked,
-                      ]}>
+                      ]}
+                    >
                       {selectedValue === item.value && (
                         <Text style={styles.checkmark}>✓</Text>
                       )}
                     </View>
-                    <Text style={[styles.optionText, {color: item.color}]}>
+                    <Text style={[styles.optionText, { color: item.color }]}>
                       {item.label}
                     </Text>
                   </TouchableOpacity>

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Modal, View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 interface ConfirmDeleteModalProps {
   visible: boolean;
@@ -17,7 +17,8 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
       transparent
       visible={visible}
       animationType="fade"
-      onRequestClose={onCancel}>
+      onRequestClose={onCancel}
+    >
       <View style={styles.overlay}>
         <View style={styles.container}>
           <Text style={styles.title}>Delete Ticket</Text>
@@ -58,7 +59,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 10,
-     color:'black'
+    color: 'black',
   },
   message: {
     fontSize: 15,

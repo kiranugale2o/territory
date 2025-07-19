@@ -1,5 +1,5 @@
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import React, {useEffect} from 'react';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,11 +7,11 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import Svg, {Path} from 'react-native-svg';
-import {RootStackParamList} from '../types';
-import {useNavigation} from '@react-navigation/native';
+import Svg, { Path } from 'react-native-svg';
+import { RootStackParamList } from '../types';
+import { useNavigation } from '@react-navigation/native';
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const PasswordChangedSuccess: React.FC = () => {
   type NavigationProp = NativeStackNavigationProp<

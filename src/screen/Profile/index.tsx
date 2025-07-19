@@ -1,5 +1,5 @@
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -13,19 +13,19 @@ import {
   TextInput,
   Modal,
 } from 'react-native';
-import Svg, {Path} from 'react-native-svg';
-import {RootStackParamList, SalesPerson} from '../../types';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {AuthContext} from '../../context/AuthContext';
+import Svg, { Path } from 'react-native-svg';
+import { RootStackParamList, SalesPerson } from '../../types';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { AuthContext } from '../../context/AuthContext';
 import {
   Asset,
   launchCamera,
   launchImageLibrary,
 } from 'react-native-image-picker';
-import {Edit, Lock, SquarePen} from 'lucide-react-native';
+import { Edit, Lock, SquarePen } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PasswordUpdateModal from '../../component/PasswordUpdateModel';
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const Profile: React.FC = () => {
   type NavigationProp = NativeStackNavigationProp<
@@ -46,22 +46,25 @@ const Profile: React.FC = () => {
   const [profileImage, setProfileImage] = useState<Asset | null>(null);
 
   const pickImage = () => {
-    launchImageLibrary(
-      {
-        mediaType: 'photo',
-      },
-      response => {
-        if (response.assets && response.assets.length > 0) {
-          const asset = response.assets[0];
-          setProfileImage(asset);
-          handleUpdate();
-        }
-      },
-    );
+    launchImageLibrary({ mediaType: 'photo' }, response => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+        return;
+      }
+      if (response.errorCode) {
+        console.error('ImagePicker Error:', response.errorMessage);
+        Alert.alert('Error', 'Failed to pick image');
+        return;
+      }
+      if (response.assets && response.assets.length > 0) {
+        const asset = response.assets[0];
+        setProfileImage(asset);
+        handleUpdate(asset);
+      }
+    });
   };
-  console.log(profileImage, 'sd');
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (datas: any) => {
     try {
       const token = await AsyncStorage.getItem('tPersonToken');
 
@@ -72,22 +75,26 @@ const Profile: React.FC = () => {
       formData.append('email', editedEmail);
 
       // Assuming you have the image info from an image picker, e.g. react-native-image-picker or expo-image-picker
-      if (profileImage) {
+      // Assuming you have the image info from an image picker, e.g. react-native-image-picker or expo-image-picker
+      if (datas) {
         formData.append('image', {
-          uri: profileImage.uri!,
-          type: profileImage.type!,
-          name: profileImage.fileName!,
+          uri: datas.uri!,
+          type: datas.type!,
+          name: datas.fileName!,
         });
       }
 
-      const response = await fetch('https://api.reparv.in/territory-partner/profile/edit', {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // DO NOT set Content-Type here! Let fetch set it automatically with the boundary
+      const response = await fetch(
+        'https://api.reparv.in/territory-partner/profile/edit',
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            // DO NOT set Content-Type here! Let fetch set it automatically with the boundary
+          },
+          body: formData,
         },
-        body: formData,
-      });
+      );
 
       const data = await response.json();
       console.log('Update response:', data);
@@ -102,14 +109,17 @@ const Profile: React.FC = () => {
     try {
       const token = await AsyncStorage.getItem('tPersonToken'); // Retrieve stored JWT
 
-      const response = await fetch('https://api.reparv.in/territory-partner/profile/', {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, // Attach token
+      const response = await fetch(
+        'https://api.reparv.in/territory-partner/profile/',
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`, // Attach token
+          },
         },
-      });
+      );
 
       const data = await response.json();
       console.log('Update response:', data);
@@ -126,50 +136,53 @@ const Profile: React.FC = () => {
       getProfile();
     }, []),
   );
-  const[isPasswordModalVisible,setPasswordModalVisible]=useState(false)
+  const [isPasswordModalVisible, setPasswordModalVisible] = useState(false);
   return (
     <View style={styles.container}>
-      
-<View
-  style={{
-    flexDirection: 'row',
-    gap: 10,
-    position: 'absolute',
-    top: -50,
-    right: 20,
-    zIndex: 10,
-    elevation: 10,
-  }}>
-  <TouchableOpacity
-    style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}
-    onPress={() => {
-      Alert.alert(
-        'Logout',
-        'Are you sure you want to log out?',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel',
-          },
-          {
-            text: 'OK',
-            onPress:auth?.logout, // ✅ Trigger logout here
-          },
-        ],
-        { cancelable: true }
-      );
-    }}>
-    <View style={styles.iconWrapper}>
-      <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <Path
-          d="M14.08 15.59L16.67 13H7V11H16.67L14.08 8.41L15.5 7L20.5 12L15.5 17L14.08 15.59ZM19 3H5C3.9 3 3 3.9 3 5V9H5V5H19V19H5V15H3V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3Z"
-          fill="#B91C1C"
-        />
-      </Svg>
-    </View>
-    <Text style={[styles.btntext, { marginTop: 2, color: '#B91C1C' }]}>Log Out</Text>
-  </TouchableOpacity>
-</View>
+      <View
+        style={{
+          flexDirection: 'row',
+          gap: 10,
+          position: 'absolute',
+          top: -50,
+          right: 20,
+          zIndex: 10,
+          elevation: 10,
+        }}
+      >
+        <TouchableOpacity
+          style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}
+          onPress={() => {
+            Alert.alert(
+              'Logout',
+              'Are you sure you want to log out?',
+              [
+                {
+                  text: 'Cancel',
+                  style: 'cancel',
+                },
+                {
+                  text: 'OK',
+                  onPress: auth?.logout, // ✅ Trigger logout here
+                },
+              ],
+              { cancelable: true },
+            );
+          }}
+        >
+          <View style={styles.iconWrapper}>
+            <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <Path
+                d="M14.08 15.59L16.67 13H7V11H16.67L14.08 8.41L15.5 7L20.5 12L15.5 17L14.08 15.59ZM19 3H5C3.9 3 3 3.9 3 5V9H5V5H19V19H5V15H3V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3Z"
+                fill="#B91C1C"
+              />
+            </Svg>
+          </View>
+          <Text style={[styles.btntext, { marginTop: 2, color: '#B91C1C' }]}>
+            Log Out
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.Imagecontainer}>
         {/* Border Circle */}
@@ -178,8 +191,11 @@ const Profile: React.FC = () => {
           <Image
             source={
               profileImage?.uri
-                ? {uri: profileImage?.uri}
-                : data?.userimage ? {uri: `https://api.reparv.in${data?.userimage}`} : require('../../../assets/community/user.png')            }
+                ? { uri: profileImage?.uri }
+                : data?.userimage
+                ? { uri: `https://api.reparv.in${data?.userimage}` }
+                : require('../../../assets/community/user.png')
+            }
             style={styles.imageCircle}
           />
 
@@ -188,7 +204,8 @@ const Profile: React.FC = () => {
             onPress={() => {
               pickImage();
             }}
-            style={styles.iconContainer}>
+            style={styles.iconContainer}
+          >
             <Svg width={21} height={21} viewBox="0 0 21 21" fill="none">
               <Path
                 fillRule="evenodd"
@@ -201,40 +218,40 @@ const Profile: React.FC = () => {
           </TouchableOpacity>
         </View>
       </View>
-<TouchableOpacity
-      onPress={() => navigation.navigate('KYC')} // Replace 'KYC' with your actual screen name
-      activeOpacity={0.8}
-      style={{
-        width: 320,
-        height: 40,
-        backgroundColor: '#FFFFFF',
-        borderRadius: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000000',
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-        elevation: 4,
-        marginVertical: 10,
-      }}
-    >
-      <Text
+      <TouchableOpacity
+        onPress={() => navigation.navigate('KYC')} // Replace 'KYC' with your actual screen name
+        activeOpacity={0.8}
         style={{
-          fontSize: 16,
-          lineHeight: 20,
-          fontWeight: '600',
-          color: '#0078DB',
+          width: 320,
+          height: 40,
+          backgroundColor: '#FFFFFF',
+          borderRadius: 20,
+          justifyContent: 'center',
+          alignItems: 'center',
+          shadowColor: '#000000',
+          shadowOpacity: 0.1,
+          shadowOffset: { width: 0, height: 2 },
+          shadowRadius: 4,
+          elevation: 4,
+          marginVertical: 10,
         }}
       >
-        KYC Details
-      </Text>
-    </TouchableOpacity>
+        <Text
+          style={{
+            fontSize: 16,
+            lineHeight: 20,
+            fontWeight: '600',
+            color: '#0078DB',
+          }}
+        >
+          KYC Details
+        </Text>
+      </TouchableOpacity>
       <View style={styles.card}>
         {/* Name */}
         <View style={styles.row}>
           <View style={styles.iconCircle}>
-             <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <Path
                 d="M10.0007 2.5C11.8423 2.5 13.334 3.99167 13.334 5.83333C13.334 7.675 11.8423 9.16667 10.0007 9.16667C8.15898 9.16667 6.66732 7.675 6.66732 5.83333C6.66732 3.99167 8.15898 2.5 10.0007 2.5ZM13.334 11.2833C13.334 12.1667 13.1007 14.225 11.509 16.525L10.834 12.5L11.6173 10.9333C11.1007 10.875 10.559 10.8333 10.0007 10.8333C9.44232 10.8333 8.90065 10.875 8.38398 10.9333L9.16732 12.5L8.49232 16.525C6.90065 14.225 6.66732 12.1667 6.66732 11.2833C4.67565 11.8667 3.33398 12.9167 3.33398 14.1667V17.5H16.6673V14.1667C16.6673 12.9167 15.334 11.8667 13.334 11.2833Z"
                 fill="black"
@@ -248,7 +265,7 @@ const Profile: React.FC = () => {
         </View>
 
         <View style={styles.separator} />
- <View style={styles.row}>
+        <View style={styles.row}>
           <View style={styles.iconCircle}>
             <Svg width="16" height="13" viewBox="0 0 16 16" fill="none">
               <Path
@@ -264,7 +281,7 @@ const Profile: React.FC = () => {
             <Text style={styles.value}>{data?.fullname}</Text>
           </View>
         </View>
-          <View style={styles.separator} />
+        <View style={styles.separator} />
         {/* Email */}
         <View style={styles.row}>
           <View style={styles.iconCircle}>
@@ -322,7 +339,8 @@ const Profile: React.FC = () => {
           onPress={() => {
             navigation.navigate('Tickets');
           }}
-          style={styles.row}>
+          style={styles.row}
+        >
           <View style={styles.iconCircle}>
             <Svg width={15} height={18} viewBox="0 0 15 18" fill="none">
               <Path
@@ -356,7 +374,8 @@ const Profile: React.FC = () => {
               width: '80%',
               justifyContent: 'space-between',
               flexDirection: 'row',
-            }}>
+            }}
+          >
             <Text style={styles.label}>Tickets</Text>
 
             <Svg width="9" height="14" viewBox="0 0 9 14" fill="none">
@@ -375,7 +394,8 @@ const Profile: React.FC = () => {
           onPress={() => {
             navigation.navigate('Referral');
           }}
-          style={styles.row}>
+          style={styles.row}
+        >
           <View style={styles.iconCircle}>
             <Svg width={16} height={16} viewBox="0 0 16 16" fill="none">
               <Path
@@ -402,7 +422,8 @@ const Profile: React.FC = () => {
               justifyContent: 'space-between',
               flexDirection: 'row',
               top: 0,
-            }}>
+            }}
+          >
             <View>
               <Text style={styles.label}>Referral</Text>
               <Text style={styles.value}>Invite friends & Earn Rewards</Text>
@@ -415,7 +436,8 @@ const Profile: React.FC = () => {
               }}
               height="14"
               viewBox="0 0 9 14"
-              fill="none">
+              fill="none"
+            >
               <Path
                 fill-rule="evenodd"
                 clip-rule="evenodd"
@@ -427,109 +449,124 @@ const Profile: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-     
-
-     {/* Logout button */}
+      {/* Logout button */}
       <View
         style={{
           flexDirection: 'row',
           gap: 10,
-          
-        }}>
-        <TouchableOpacity style={[styles.button,]} onPress={()=>{setModalVisible(true)}}>
+        }}
+      >
+        <TouchableOpacity
+          style={[styles.button]}
+          onPress={() => {
+            setModalVisible(true);
+          }}
+        >
           <View style={styles.iconWrapper}>
-           <Edit color={'black'}/>
+            <Edit color={'black'} />
           </View>
-          <Text style={[styles.updateButtonText,{color:'black'}]}>Update Profile</Text>
+          <Text style={[styles.updateButtonText, { color: 'black' }]}>
+            Update Profile
+          </Text>
         </TouchableOpacity>
-          <TouchableOpacity style={[styles.button,{
-          }]} onPress={()=>{setPasswordModalVisible(true)}}>
+        <TouchableOpacity
+          style={[styles.button, {}]}
+          onPress={() => {
+            setPasswordModalVisible(true);
+          }}
+        >
           <View style={styles.iconWrapper}>
-          <Lock color={'black'}/>
+            <Lock color={'black'} />
           </View>
-            <Text style={[styles.updateButtonText,{color:'black',width:100,marginInline:-20}]}>Update Password</Text>
-  
+          <Text
+            style={[
+              styles.updateButtonText,
+              { color: 'black', width: 100, marginInline: -20 },
+            ]}
+          >
+            Update Password
+          </Text>
         </TouchableOpacity>
-        
       </View>
 
       {/* update Profile model */}
-     
-     <PasswordUpdateModal
-  visible={isPasswordModalVisible}
-  onClose={() => setPasswordModalVisible(false)}
-  onUpdatePassword={(data) => {
-    console.log('Password data:', data);
-    // Call API here
-  }}
-/>
 
+      <PasswordUpdateModal
+        visible={isPasswordModalVisible}
+        onClose={() => setPasswordModalVisible(false)}
+        onUpdatePassword={data => {
+          console.log('Password data:', data);
+          // Call API here
+        }}
+      />
 
       <Modal
-  visible={isModalVisible}
-  animationType="slide"
-  transparent
-  onRequestClose={() => setModalVisible(false)}>
-  <View style={styles.modalBackground}>
-    <View style={styles.modalContainer}>
-      <Text style={styles.modalTitle}>Edit Profile</Text>
+        visible={isModalVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Edit Profile</Text>
 
-      <Text style={styles.inputLabel}>Username</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        value={userName}
-        onChangeText={setuserName}
-      />
+            <Text style={styles.inputLabel}>Username</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Username"
+              value={userName}
+              onChangeText={setuserName}
+            />
 
-      <Text style={styles.inputLabel}>Name</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        placeholderTextColor={'gray'}
-        value={editedName}
-        onChangeText={setEditedName}
-      />
+            <Text style={styles.inputLabel}>Name</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Name"
+              placeholderTextColor={'gray'}
+              value={editedName}
+              onChangeText={setEditedName}
+            />
 
-      <Text style={styles.inputLabel}>Email</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-         placeholderTextColor={'gray'}
-        value={editedEmail}
-        onChangeText={setEditedEmail}
-        keyboardType="email-address"
-      />
+            <Text style={styles.inputLabel}>Email</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              placeholderTextColor={'gray'}
+              value={editedEmail}
+              onChangeText={setEditedEmail}
+              keyboardType="email-address"
+            />
 
-      <Text style={styles.inputLabel}>Mobile</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Mobile"
-        value={editedMobile}
-         placeholderTextColor={'gray'}
-        onChangeText={setEditedMobile}
-        keyboardType="phone-pad"
-      />
+            <Text style={styles.inputLabel}>Mobile</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Mobile"
+              value={editedMobile}
+              placeholderTextColor={'gray'}
+              onChangeText={setEditedMobile}
+              keyboardType="phone-pad"
+            />
 
-      <View style={styles.modalButtons}>
-        <TouchableOpacity
-          style={[styles.saveButton,{padding:10}]}
-          onPress={() => {
-            setModalVisible(false);
-            handleUpdate();
-          }}>
-          <Text style={styles.saveButtonText}>Save</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => setModalVisible(false)}>
-          <Text style={styles.cancelButtonText}>Cancel</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </View>
-</Modal>
-
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.saveButton, { padding: 10 }]}
+                onPress={() => {
+                  setModalVisible(false);
+                  handleUpdate();
+                }}
+              >
+                <Text style={styles.saveButtonText}>Save</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -540,10 +577,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
   },
-  inputLabel:
-{
-color:'gray'
-},
+  inputLabel: {
+    color: 'gray',
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -625,7 +661,7 @@ color:'gray'
     flexDirection: 'row',
     alignItems: 'center',
     paddingInline: 16,
-    padding:5,
+    padding: 5,
     width: 145,
     height: 44,
     top: -10,
@@ -665,11 +701,11 @@ color:'gray'
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-     color:'black'
+    color: 'black',
   },
   input: {
     borderWidth: 1,
-     color:'black',
+    color: 'black',
     borderColor: '#ccc',
     borderRadius: 5,
     padding: 10,
@@ -678,28 +714,28 @@ color:'gray'
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    margin:'auto',
-    gap:6
+    margin: 'auto',
+    gap: 6,
   },
   saveButton: {
-    width:'40%',
+    width: '40%',
     backgroundColor: '#4CAF50',
     padding: 10,
     borderRadius: 5,
   },
   cancelButton: {
-     width:'40%',
+    width: '40%',
     backgroundColor: '#f44336',
     padding: 10,
     borderRadius: 5,
   },
   saveButtonText: {
     color: '#fff',
-    margin:'auto'
+    margin: 'auto',
   },
   cancelButtonText: {
     color: '#fff',
-    margin:'auto'
+    margin: 'auto',
   },
   updateButton: {
     marginTop: 20,
@@ -710,7 +746,7 @@ color:'gray'
     alignItems: 'center',
   },
   updateButtonText: {
-   color:'black',
+    color: 'black',
     fontWeight: 'bold',
   },
 });

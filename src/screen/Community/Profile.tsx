@@ -1,9 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   Dimensions,
   FlatList,
@@ -48,69 +43,75 @@ const UserProfile: React.FC = () => {
     return u?.id;
   };
 
-  const  getUserRole = (r:any) => {
-  if (r === "Sales Person") return "sales";
-  if (r === "Territory Partner") return "territory";
-  if (r === "Onboarding Partner") return "onboarding";
-  return "projectpartner";
-};
+  const getUserRole = (r: any) => {
+    if (r === 'Sales Person') return 'sales';
+    if (r === 'Territory Partner') return 'territory';
+    if (r === 'Onboarding Partner') return 'onboarding';
+    return 'projectpartner';
+  };
 
   const fetchUserPosts = async () => {
-  const controller = new AbortController();
-  try {
-    setLoading(true);
-    const id = getUserIdByRole(user);
+    const controller = new AbortController();
+    try {
+      setLoading(true);
+      const id = getUserIdByRole(user);
 
-    // Fetch both endpoints in parallel
-    const [territoryRes, salesRes] = await Promise.all([
-      fetch(
-        `https://api.reparv.in/territoryapp/post/getUserPosts?id=${id}`,
-        { signal: controller.signal }
-      ),
-      fetch(
-        `https://api.reparv.in/salesapp/post/getUserPosts?id=${id}`,
-        { signal: controller.signal }
-      ),
-    ]);
+      // Fetch both endpoints in parallel
+      const [territoryRes, salesRes] = await Promise.all([
+        fetch(`https://api.reparv.in/territoryapp/post/getUserPosts?id=${id}`, {
+          signal: controller.signal,
+        }),
+        fetch(`https://api.reparv.in/salesapp/post/getUserPosts?id=${id}`, {
+          signal: controller.signal,
+        }),
+      ]);
 
-    if (!territoryRes.ok) throw new Error(`Territory API status ${territoryRes.status}`);
-    if (!salesRes.ok) throw new Error(`Sales API status ${salesRes.status}`);
+      if (!territoryRes.ok)
+        throw new Error(`Territory API status ${territoryRes.status}`);
+      if (!salesRes.ok) throw new Error(`Sales API status ${salesRes.status}`);
 
-    const [territoryData, salesData] = await Promise.all([
-      territoryRes.json(),
-      salesRes.json(),
-    ]);
+      const [territoryData, salesData] = await Promise.all([
+        territoryRes.json(),
+        salesRes.json(),
+      ]);
 
-    // Combine posts
-    const combinedPosts = [...territoryData, ...salesData];
+      // Combine posts
+      const combinedPosts = [...territoryData, ...salesData];
 
-    // Optionally, sort by recency (newest first)
-    combinedPosts.sort((a, b) => {
-      return (
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
-    });
+      // Optionally, sort by recency (newest first)
+      combinedPosts.sort((a, b) => {
+        return (
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+      });
 
-    setPosts(combinedPosts);
-  } catch (e: any) {
-    if (e.name !== "AbortError") {
-      console.error("Failed to fetch user posts", e);
+      setPosts(combinedPosts);
+    } catch (e: any) {
+      if (e.name !== 'AbortError') {
+        console.error('Failed to fetch user posts', e);
+      }
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-  return () => controller.abort();
-};
-
+    return () => controller.abort();
+  };
 
   const fetchFollowersAndFollowing = () => {
     const idToUse = getUserIdByRole(user);
-https://192.168.132.151:3000
-    fetch(`https://api.reparv.in/territoryapp/user/add/${idToUse}/${getUserRole(user?.role)}/followers`)
+    //192.168.132.151:3000
+    https: fetch(
+      `https://api.reparv.in/territoryapp/user/add/${idToUse}/${getUserRole(
+        user?.role,
+      )}/followers`,
+    )
       .then(res => res.json())
       .then(setFollowers);
 
-    fetch(`https://api.reparv.in/territoryapp/user/add/${idToUse}/${getUserRole(user?.role)}/following`)
+    fetch(
+      `https://api.reparv.in/territoryapp/user/add/${idToUse}/${getUserRole(
+        user?.role,
+      )}/following`,
+    )
       .then(res => res.json())
       .then(setFollowing);
   };
@@ -118,15 +119,17 @@ https://192.168.132.151:3000
   const checkFollowingStatus = async () => {
     try {
       const res = await fetch(
-        `https://api.reparv.in/territoryapp/user/add/${auth?.user?.id}/${getUserRole(auth?.user?.role)}/following`
+        `https://api.reparv.in/territoryapp/user/add/${
+          auth?.user?.id
+        }/${getUserRole(auth?.user?.role)}/following`,
       );
       const data = await res.json();
 
       const followedUserId = getUserIdByRole(user);
 
       const isAlreadyFollowing = data.some((f: any) => {
-  return f.id?.toString() === followedUserId?.toString();
-});
+        return f.id?.toString() === followedUserId?.toString();
+      });
 
       setIsFollowing(isAlreadyFollowing);
     } catch (err) {
@@ -136,7 +139,7 @@ https://192.168.132.151:3000
 
   const toggleFollow = async () => {
     const idToUse = getUserIdByRole(user);
-    const userRole=getUserRole(user?.role);
+    const userRole = getUserRole(user?.role);
     const payload = {
       follower_id: auth?.user?.id,
       following_id: idToUse,
@@ -144,7 +147,6 @@ https://192.168.132.151:3000
       following_type: userRole,
     };
 
-    
     const url = isFollowing
       ? 'https://api.reparv.in/territoryapp/user/add/unfollow'
       : 'https://api.reparv.in/territoryapp/user/add/follow';
@@ -185,7 +187,7 @@ https://192.168.132.151:3000
   useFocusEffect(
     useCallback(() => {
       fetchUserPosts();
-    }, [])
+    }, []),
   );
 
   useEffect(() => {
@@ -222,7 +224,14 @@ https://192.168.132.151:3000
 
   const NoPostPlaceholder = () => (
     <View style={styles.noPostBox}>
-      <Svg width={44} height={44} viewBox="0 0 24 24" stroke="gray" fill="none" strokeWidth={2}>
+      <Svg
+        width={44}
+        height={44}
+        viewBox="0 0 24 24"
+        stroke="gray"
+        fill="none"
+        strokeWidth={2}
+      >
         <Line x1="2" y1="2" x2="22" y2="22" />
         <Path d="M7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16" />
         <Path d="M9.5 4h5L17 7h3a2 2 0 0 1 2 2v7.5" />
@@ -254,10 +263,7 @@ https://192.168.132.151:3000
           {auth?.user?.id !== getUserIdByRole(user) && (
             <TouchableOpacity
               onPress={toggleFollow}
-              style={[
-                styles.followBtn,
-                isFollowing && styles.followBtnOutline,
-              ]}
+              style={[styles.followBtn, isFollowing && styles.followBtnOutline]}
             >
               <Text
                 style={[
@@ -337,7 +343,6 @@ const Info = ({ label, value }: { label: string; value: string }) => (
 /* Styles */
 /* ... keep your styles unchanged ... */
 
-
 /* Styles */
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: '#fff' },
@@ -383,7 +388,7 @@ const styles = StyleSheet.create({
   followBtn: {
     marginTop: 12,
     alignSelf: 'stretch',
-    backgroundColor: '#00C851',
+    backgroundColor: '#0078DB',
     paddingVertical: 6,
     borderRadius: 6,
   },
@@ -413,24 +418,24 @@ const styles = StyleSheet.create({
     margin: GRID_GAP,
     backgroundColor: '#ddd',
   },
-postThumbWrapper: {
-  margin: GRID_GAP,
-  width: THUMB_SIZE,
-  height: THUMB_SIZE,
-},
+  postThumbWrapper: {
+    margin: GRID_GAP,
+    width: THUMB_SIZE,
+    height: THUMB_SIZE,
+  },
 
-textOnlyThumb: {
-  backgroundColor: '#f0f0f0',
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: 6,
-},
+  textOnlyThumb: {
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 6,
+  },
 
-textOnlyContent: {
-  fontSize: 12,
-  color: '#333',
-  textAlign: 'center',
-},
+  textOnlyContent: {
+    fontSize: 12,
+    color: '#333',
+    textAlign: 'center',
+  },
 
   noPostBox: {
     alignItems: 'center',

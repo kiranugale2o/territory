@@ -116,6 +116,8 @@ export interface Enquirer {
   updated_at: string;
   created_at: string;
   frontView: string[];
+  commissionAmount: number;
+  category: string;
   territoryName: string | null;
   territoryContact: string | null;
 }
@@ -139,6 +141,7 @@ export interface Enquiry {
   visitdate: string;
   territorystatus: string;
   state: string;
+  commissionAmount: number;
   updated_at: string;
   created_at: string;
   frontView: string[]; // parsed from JSON string
@@ -170,7 +173,17 @@ export interface SalesPerson {
   updated_at: string; // Use Date if you parse to Date object
   created_at: string; // Use Date if you parse to Date object
 }
-
+export interface PostProps {
+  postId: number;
+  userId: number;
+  postContent: string;
+  image: string | null;
+  likes: number;
+  created_at: string;
+  fullname: string;
+  city: string | null;
+  userimage: string | null;
+}
 export type RootStackParamList = {
   Sign_In: undefined;
   ForgotPassword: undefined;
@@ -182,12 +195,12 @@ export type RootStackParamList = {
 
   ViewSchedule: undefined;
   SelectterritoryPartner: undefined;
-  ConfirmSchedule: {selectedIndex: number};
+  ConfirmSchedule: { selectedIndex: number };
   SuccessScreen: undefined;
   AddClient: undefined;
-  Flat: {flatType: string};
-  FlatInfo: {flat: Property};
-  UserProfile: {user: SalesPerson};
+  Flat: { flatType: string };
+  FlatInfo: { flat: Property };
+  UserProfile: { user: SalesPerson };
   Community: undefined;
   NewPost: undefined;
   Referral: undefined;
@@ -198,7 +211,10 @@ export type RootStackParamList = {
     salespersonid: number;
     booktype: string;
   };
-  KYC:undefined;
+  PostDetailScreen: { post: PostProps };
+  FollowersScreen: undefined;
+  FollowingScreen: undefined;
+  KYC: undefined;
   // add other screens here
 };
 

@@ -1,5 +1,5 @@
-import {useNavigation} from '@react-navigation/native';
-import React, {JSX, useContext, useState} from 'react';
+import { useNavigation } from '@react-navigation/native';
+import React, { JSX, useContext, useState } from 'react';
 import {
   View,
   Text,
@@ -19,15 +19,15 @@ import {
   Keyboard,
   ScrollView,
 } from 'react-native';
-import {RootStackParamList} from '../types';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import Svg, {Path} from 'react-native-svg';
-import {AuthContext} from '../context/AuthContext';
+import { RootStackParamList } from '../types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Svg, { Path } from 'react-native-svg';
+import { AuthContext } from '../context/AuthContext';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {toastConfig} from '../utils';
+import { toastConfig } from '../utils';
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 interface ErrorState {
   emailoruser: string;
   password: string;
@@ -47,12 +47,10 @@ const SignIn = (): JSX.Element => {
   const [error, setError] = useState<ErrorState>({
     emailoruser: '',
     password: '',
-   
   });
-// near your other useState hooks
-const [referral, setReferral] = useState('');
+  // near your other useState hooks
+  const [referral, setReferral] = useState('');
 
-  
   const showToast = async (data: string) => {
     Toast.show({
       type: 'success',
@@ -87,12 +85,12 @@ const [referral, setReferral] = useState('');
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({emailOrUsername: emailoruser, password}),
+          body: JSON.stringify({ emailOrUsername: emailoruser, password }),
         },
       );
 
       const data = await response.json();
-    
+
       console.log(data);
 
       if (!response.ok) {
@@ -115,26 +113,24 @@ const [referral, setReferral] = useState('');
         await AsyncStorage.setItem('tPersonInfo', JSON.stringify(data?.user));
       }, 500); // Delay slightly (500ms) to allow toast to display
 
-
-        if(referral!==''){
+      if (referral !== '') {
         fetch('https://api.reparv.in/territoryapp/client/updaterefer', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    referenceno: referral,
-    userId:auth?.user?.id ,
-  }),
-})
-  .then(response => response.json())
-  .then(data => {
-    console.log('Response:', data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            referenceno: referral,
+            userId: auth?.user?.id,
+          }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Response:', data);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
       }
       // You could now navigate or store the user using context or AsyncStorage
     } catch (error) {
@@ -144,21 +140,17 @@ const [referral, setReferral] = useState('');
     //}
   };
 
-
-
-
   return (
     <View
       style={{
         flex: 1,
         width: '100%',
         backgroundColor: '#EAF6FF',
-      }}>
+      }}
+    >
       {/* logo */}
 
-     
       <View style={styles.logo}>
-       
         <Svg width="227" height="96" viewBox="0 0 227 96" fill="none">
           <Path
             d="M172.484 50.7169C171.817 51.0362 171.203 51.4575 170.665 51.9655C169.465 53.1026 168.547 54.8061 168.221 57.3167L167.539 56.4917L162.687 50.6232L160.819 48.3579L159.133 46.32L128.729 9.51689L98.4634 43.7023L94.6953 47.9655L89.4644 53.8741C89.3671 52.5185 88.9252 51.2102 88.1807 50.0732C87.4363 48.9362 86.4138 48.0081 85.2102 47.3768L90.3831 41.5351L93.3619 38.1593L126.013 1.26263C126.37 0.85717 126.811 0.534273 127.306 0.316348C127.8 0.0984231 128.336 -0.00930867 128.876 0.000630163C129.415 0.00852683 129.946 0.132054 130.433 0.362856C130.92 0.593658 131.352 0.926352 131.699 1.33844L162.678 38.8416L164.413 40.9464L165.51 42.2842L167.53 44.728L172.484 50.7169Z"
@@ -211,123 +203,152 @@ const [referral, setReferral] = useState('');
         </Svg>
       </View>
 
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View
+              style={{
+                width: '100%',
+                marginTop: 0,
+                flex: 1,
+                backgroundColor: '#EAF6FF',
+              }}
+            >
+              <View style={styles.loginBox}>
+                <View
+                  style={{
+                    width: '100%',
+                    //   margin: 'auto',
+                    marginTop: 0,
+                  }}
+                >
+                  <View style={styles.loginBox}>
+                    {/* Title */}
+                    <View style={styles.textContainer}>
+                      <Text style={styles.title}>Login</Text>
+                    </View>
 
-<KeyboardAvoidingView
-  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-  style={{ flex: 1 }}>
-  <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1 }}
-      keyboardShouldPersistTaps="handled">
-      <View
-        style={{
-          width: '100%',
-          marginTop: 0,
-          flex: 1,
-          backgroundColor: '#EAF6FF',
-        }}>
-        <View style={styles.loginBox}>
-           <View
-        style={{
-          width: '100%',
-       //   margin: 'auto',
-          marginTop: 0,
-        }}>
-        <View style={styles.loginBox}>
-          {/* Title */}
-          <View style={styles.textContainer}>
-            <Text style={styles.title}>Login</Text>
-          </View>
+                    {/* Input Fields */}
+                    <View style={styles.inputContainer}>
+                      {/* Email Input */}
+                      <View style={styles.inputField}>
+                        <Text style={styles.label}>Email</Text>
 
-          {/* Input Fields */}
-          <View style={styles.inputContainer}>
-            {/* Email Input */}
-            <View style={styles.inputField}>
-              <Text style={styles.label}>Email</Text>
+                        <View style={[styles.inputBox]}>
+                          <Svg
+                            width="16"
+                            height="17"
+                            viewBox="0 0 16 17"
+                            fill="none"
+                          >
+                            <Path
+                              d="M4 14.5V13.1667C4 12.4594 4.28095 11.7811 4.78105 11.281C5.28115 10.781 5.95942 10.5 6.66667 10.5H9.33333C10.0406 10.5 10.7189 10.781 11.219 11.281C11.719 11.7811 12 12.4594 12 13.1667V14.5M5.33333 5.16667C5.33333 5.87391 5.61428 6.55219 6.11438 7.05229C6.61448 7.55238 7.29276 7.83333 8 7.83333C8.70724 7.83333 9.38552 7.55238 9.88562 7.05229C10.3857 6.55219 10.6667 5.87391 10.6667 5.16667C10.6667 4.45942 10.3857 3.78115 9.88562 3.28105C9.38552 2.78095 8.70724 2.5 8 2.5C7.29276 2.5 6.61448 2.78095 6.11438 3.28105C5.61428 3.78115 5.33333 4.45942 5.33333 5.16667Z"
+                              stroke="#ACB5BB"
+                              strokeWidth="1.3"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </Svg>
 
-              <View style={[styles.inputBox]}>
-                <Svg width="16" height="17" viewBox="0 0 16 17" fill="none">
-                  <Path
-                    d="M4 14.5V13.1667C4 12.4594 4.28095 11.7811 4.78105 11.281C5.28115 10.781 5.95942 10.5 6.66667 10.5H9.33333C10.0406 10.5 10.7189 10.781 11.219 11.281C11.719 11.7811 12 12.4594 12 13.1667V14.5M5.33333 5.16667C5.33333 5.87391 5.61428 6.55219 6.11438 7.05229C6.61448 7.55238 7.29276 7.83333 8 7.83333C8.70724 7.83333 9.38552 7.55238 9.88562 7.05229C10.3857 6.55219 10.6667 5.87391 10.6667 5.16667C10.6667 4.45942 10.3857 3.78115 9.88562 3.28105C9.38552 2.78095 8.70724 2.5 8 2.5C7.29276 2.5 6.61448 2.78095 6.11438 3.28105C5.61428 3.78115 5.33333 4.45942 5.33333 5.16667Z"
-                    stroke="#ACB5BB"
-                    strokeWidth="1.3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </Svg>
+                          <TextInput
+                            style={styles.input}
+                            placeholder="yourname@gmail.com"
+                            placeholderTextColor="rgba(0, 0, 0, 0.4)"
+                            // value={email}
+                            onChangeText={setEmail}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                          />
+                        </View>
+                        {error?.emailoruser !== '' && (
+                          <Text style={styles.errorText}>
+                            {error.emailoruser}
+                          </Text>
+                        )}
+                      </View>
 
-                <TextInput
-                  style={styles.input}
-                  placeholder="yourname@gmail.com"
-                  placeholderTextColor="rgba(0, 0, 0, 0.4)"
-                  // value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
+                      {/* Password Input */}
+                      <View style={styles.inputField}>
+                        <Text style={styles.label}>Password</Text>
+                        <View
+                          style={[
+                            styles.inputBox,
+                            ,
+                            { justifyContent: 'space-between' },
+                          ]}
+                        >
+                          <TextInput
+                            style={styles.input}
+                            placeholder="password"
+                            placeholderTextColor="rgba(0, 0, 0, 0.4)"
+                            // value={password}
+                            onChangeText={setPassword}
+                          />
+                          <Svg
+                            width="16"
+                            height="17"
+                            viewBox="0 0 16 17"
+                            fill="none"
+                          >
+                            <Path
+                              d="M7.05671 7.55794C6.8067 7.80804 6.66628 8.14721 6.66634 8.50085C6.6664 8.85448 6.80694 9.1936 7.05704 9.44361C7.30714 9.69362 7.64631 9.83404 7.99994 9.83398C8.35358 9.83392 8.6927 9.69338 8.94271 9.44328M11.1207 11.6154C10.1855 12.2005 9.1031 12.5073 8 12.5C5.6 12.5 3.6 11.1667 2 8.50002C2.848 7.08669 3.808 6.04802 4.88 5.38402M6.78667 4.62002C7.18603 4.53917 7.59254 4.49897 8 4.50002C10.4 4.50002 12.4 5.83335 14 8.50002C13.556 9.24002 13.0807 9.87802 12.5747 10.4134M2 2.5L14 14.5"
+                              stroke="rgba(0, 0, 0, 0.4)"
+                              stroke-opacity="0.4"
+                              stroke-width="1.3"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </Svg>
+                        </View>
+                        {error.password !== '' && (
+                          <Text style={styles.errorText}>{error.password}</Text>
+                        )}
+                      </View>
+                    </View>
+
+                    {/* Remember Me & Forgot Password */}
+                    <View style={styles.optionsContainer}>
+                      <TouchableOpacity
+                        style={[styles.checkboxContainer]}
+                        onPress={() => setChecked(!checked)}
+                      >
+                        <View
+                          style={[styles.checkbox, checked && styles.checked]}
+                        >
+                          {checked && <Text style={styles.checkmark}>✓</Text>}
+                        </View>
+                        <Text style={styles.label}>Remember Me</Text>
+                      </TouchableOpacity>
+                      <Pressable
+                        onPress={() => navigation.navigate('ForgotPassword')}
+                      >
+                        <Text style={styles.forgotPassword}>
+                          Forgot Password?
+                        </Text>
+                      </Pressable>
+                    </View>
+
+                    {/* Login Button */}
+                    <TouchableOpacity
+                      style={[styles.loginBtn]}
+                      onPress={handleSignIn}
+                    >
+                      <Text style={styles.loginBtnText}>Log In</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
-              {error?.emailoruser !== '' && (
-                <Text style={styles.errorText}>{error.emailoruser}</Text>
-              )}
             </View>
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
 
-            {/* Password Input */}
-            <View style={styles.inputField}>
-              <Text style={styles.label}>Password</Text>
-              <View
-                style={[styles.inputBox, , {justifyContent: 'space-between'}]}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="password"
-                  placeholderTextColor="rgba(0, 0, 0, 0.4)"
-                  // value={password}
-                  onChangeText={setPassword}
-                />
-                <Svg width="16" height="17" viewBox="0 0 16 17" fill="none">
-                  <Path
-                    d="M7.05671 7.55794C6.8067 7.80804 6.66628 8.14721 6.66634 8.50085C6.6664 8.85448 6.80694 9.1936 7.05704 9.44361C7.30714 9.69362 7.64631 9.83404 7.99994 9.83398C8.35358 9.83392 8.6927 9.69338 8.94271 9.44328M11.1207 11.6154C10.1855 12.2005 9.1031 12.5073 8 12.5C5.6 12.5 3.6 11.1667 2 8.50002C2.848 7.08669 3.808 6.04802 4.88 5.38402M6.78667 4.62002C7.18603 4.53917 7.59254 4.49897 8 4.50002C10.4 4.50002 12.4 5.83335 14 8.50002C13.556 9.24002 13.0807 9.87802 12.5747 10.4134M2 2.5L14 14.5"
-                    stroke="rgba(0, 0, 0, 0.4)"
-                    stroke-opacity="0.4"
-                    stroke-width="1.3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </Svg>
-              </View>
-              {error.password !== '' && (
-                <Text style={styles.errorText}>{error.password}</Text>
-              )}
-            </View>
-          </View>
-
-          {/* Remember Me & Forgot Password */}
-          <View style={styles.optionsContainer}>
-            <TouchableOpacity
-              style={[styles.checkboxContainer]}
-              onPress={() => setChecked(!checked)}>
-              <View style={[styles.checkbox, checked && styles.checked]}>
-                {checked && <Text style={styles.checkmark}>✓</Text>}
-              </View>
-              <Text style={styles.label}>Remember Me</Text>
-            </TouchableOpacity>
-            <Pressable onPress={() => navigation.navigate('ForgotPassword')}>
-              <Text style={styles.forgotPassword}>Forgot Password?</Text>
-            </Pressable>
-          </View>
-
-          {/* Login Button */}
-          <TouchableOpacity style={[styles.loginBtn]} onPress={handleSignIn}>
-            <Text style={styles.loginBtnText}>Log In</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-        </View>
-      </View>
-    </ScrollView>
-  </TouchableWithoutFeedback>
-</KeyboardAvoidingView>
-
-     
       <Toast config={toastConfig} />
     </View>
   );

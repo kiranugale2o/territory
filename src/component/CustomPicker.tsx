@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   StyleSheet,
   GestureResponderEvent,
 } from 'react-native';
-import Svg, {Path} from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 
 type OptionType = {
   label: string;
@@ -38,14 +38,16 @@ const CustomPicker: React.FC<CustomPickerProps> = ({
       <TouchableOpacity
         style={[
           styles.selector,
-          {flexDirection: 'row', justifyContent: 'space-between'},
+          { flexDirection: 'row', justifyContent: 'space-between' },
         ]}
-        onPress={() => setModalVisible(true)}>
+        onPress={() => setModalVisible(true)}
+      >
         <View
           style={{
             flexDirection: 'row',
             gap: 2,
-          }}>
+          }}
+        >
           <View
             style={[
               styles.ellipse,
@@ -78,7 +80,8 @@ const CustomPicker: React.FC<CustomPickerProps> = ({
           <Text
             style={{
               color: selectedValue ? 'black' : 'gray',
-            }}>
+            }}
+          >
             {selectedValue || placeholder}
           </Text>
         </View>
@@ -98,16 +101,19 @@ const CustomPicker: React.FC<CustomPickerProps> = ({
         transparent
         visible={modalVisible}
         animationType="fade"
-        onRequestClose={() => setModalVisible(false)}>
+        onRequestClose={() => setModalVisible(false)}
+      >
         <TouchableOpacity
           activeOpacity={1}
           style={styles.modalOverlay}
-          onPressOut={() => setModalVisible(false)}>
+          onPressOut={() => setModalVisible(false)}
+        >
           <View style={styles.modalContent}>
             {options.map((option, i) => (
               <View
                 key={i}
-                style={{flexDirection: 'row', alignItems: 'center', gap: 6}}>
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+              >
                 <View
                   style={[
                     styles.ellipse,
@@ -130,12 +136,14 @@ const CustomPicker: React.FC<CustomPickerProps> = ({
                   onPress={() => {
                     onValueChange(option.value);
                     setModalVisible(false);
-                  }}>
+                  }}
+                >
                   <Text
                     style={{
                       fontSize: 16,
                       color: 'black',
-                    }}>
+                    }}
+                  >
                     {option.label}
                   </Text>
                 </TouchableOpacity>

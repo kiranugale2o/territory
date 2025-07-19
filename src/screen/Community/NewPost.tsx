@@ -1,5 +1,5 @@
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import React, {useContext, useEffect, useState} from 'react';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
   TextInput,
@@ -11,8 +11,8 @@ import {
   BackHandler,
   ScrollView,
 } from 'react-native';
-import {Asset, launchImageLibrary} from 'react-native-image-picker';
-import Svg, {Path} from 'react-native-svg';
+import { Asset, launchImageLibrary } from 'react-native-image-picker';
+import Svg, { Path } from 'react-native-svg';
 
 const NewPost: React.FC = () => {
   const [postText, setPostText] = useState('');
@@ -119,7 +119,7 @@ const NewPost: React.FC = () => {
   console.log(imageUri);
 
   return (
-    <View style={{flex: 1, width: '100%', backgroundColor: 'white'}}>
+    <View style={{ flex: 1, width: '100%', backgroundColor: 'white' }}>
       <View style={[styles.wrapper]}>
         <View style={styles.card}>
           <ScrollView>
@@ -129,9 +129,10 @@ const NewPost: React.FC = () => {
               placeholderTextColor="rgba(0, 0, 0, 0.4)"
               multiline
               value={postText}
-              onChangeText={setPostText}></TextInput>
+              onChangeText={setPostText}
+            ></TextInput>
             {imageUri && (
-              <Image source={{uri: imageUri.uri}} style={styles.postImage} />
+              <Image source={{ uri: imageUri.uri }} style={styles.postImage} />
             )}
           </ScrollView>
         </View>
@@ -139,7 +140,8 @@ const NewPost: React.FC = () => {
         <View
           style={{
             width: '90%',
-          }}>
+          }}
+        >
           <TouchableOpacity style={styles.mediaRow} onPress={pickImage}>
             <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <Path
@@ -158,7 +160,8 @@ const NewPost: React.FC = () => {
             postText || imageUri ? styles.enabledButton : styles.disabledButton,
           ]}
           onPress={handlePost}
-          disabled={!postText && !imageUri}>
+          disabled={!postText && !imageUri}
+        >
           <Text style={styles.postButtonText}>Post</Text>
         </TouchableOpacity>
 
@@ -278,13 +281,13 @@ const styles = StyleSheet.create({
 
 // DesCard
 
-import {Modal} from 'react-native';
-import {RootStackParamList} from '../../types';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { Modal } from 'react-native';
+import { RootStackParamList } from '../../types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import PostNotification from '../../component/PostNotification';
-import {AuthContext} from '../../context/AuthContext';
+import { AuthContext } from '../../context/AuthContext';
 import Toast from 'react-native-toast-message';
-import {toastConfig} from '../../utils';
+import { toastConfig } from '../../utils';
 
 interface DiscardPostModalProps {
   visible: boolean;
@@ -309,8 +312,9 @@ const DiscardPostModal: React.FC<DiscardPostModalProps> = ({
               <Text style={styles2.cancelText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles2.discardButton, {flexDirection: 'row', gap: 5}]}
-              onPress={onDiscard}>
+              style={[styles2.discardButton, { flexDirection: 'row', gap: 5 }]}
+              onPress={onDiscard}
+            >
               <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
                 <Path
                   d="M7 21C6.45 21 5.97917 20.8042 5.5875 20.4125C5.19583 20.0208 5 19.55 5 19V6H4V4H9V3H15V4H20V6H19V19C19 19.55 18.8042 20.0208 18.4125 20.4125C18.0208 20.8042 17.55 21 17 21H7ZM17 6H7V19H17V6ZM9 17H11V8H9V17ZM13 17H15V8H13V17Z"

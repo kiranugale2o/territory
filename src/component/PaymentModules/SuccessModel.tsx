@@ -9,9 +9,9 @@ import {
   Modal,
 } from 'react-native';
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
-const SuccessModal = ({onClose}: {onClose: () => void}) => {
+const SuccessModal = ({ onClose }: { onClose: () => void }) => {
   return (
     <Modal transparent animationType="slide" onRequestClose={onClose}>
       <View
@@ -20,7 +20,8 @@ const SuccessModal = ({onClose}: {onClose: () => void}) => {
           backgroundColor: 'rgba(0,0,0,0.4)',
           justifyContent: 'center',
           alignItems: 'center',
-        }}>
+        }}
+      >
         <View
           style={{
             backgroundColor: 'white',
@@ -28,7 +29,8 @@ const SuccessModal = ({onClose}: {onClose: () => void}) => {
             padding: 30,
             width: '95%',
             elevation: 5,
-          }}>
+          }}
+        >
           {/* <View style={styles.overlay}> */}
           {/* <View style={styles.card}> */}
           {/* Close Icon */}
@@ -117,14 +119,14 @@ const styles = StyleSheet.create({
     width: 16,
     height: 2,
     backgroundColor: '#FFFFFF',
-    transform: [{rotate: '45deg'}],
+    transform: [{ rotate: '45deg' }],
     position: 'absolute',
   },
   innerClose: {
     width: 16,
     height: 2,
     backgroundColor: '#FFFFFF',
-    transform: [{rotate: '-45deg'}],
+    transform: [{ rotate: '-45deg' }],
     position: 'absolute',
   },
   successContainer: {
@@ -152,7 +154,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 2,
     borderBottomWidth: 2,
     borderColor: '#fff',
-    transform: [{rotate: '-45deg'}],
+    transform: [{ rotate: '-45deg' }],
   },
   textContainer: {
     marginTop: 20,

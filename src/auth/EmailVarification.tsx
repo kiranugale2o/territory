@@ -1,4 +1,4 @@
-import React, {useRef, useState, useEffect} from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,34 +6,40 @@ import {
   TextInput,
   Dimensions,
   TouchableOpacity,
+  NativeSyntheticEvent,
+  TextInputKeyPressEventData,
+  TextInput as RNTextInput,
 } from 'react-native';
-import {RootStackParamList} from '../types';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useNavigation} from '@react-navigation/native';
+import { RootStackParamList } from '../types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
-import {toastConfig} from '../utils';
+import { toastConfig } from '../utils';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-const EmailVerification = () => {
-  type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'SignIn'>;
+const EmailVerification: React.FC = () => {
+  type NavigationProp = NativeStackNavigationProp<
+    RootStackParamList,
+    'Sign_In'
+  >;
   const navigation = useNavigation<NavigationProp>();
 
   const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
   const [newOtp, setNewOtp] = useState<number | null>(null);
   const [resendTimer, setResendTimer] = useState(300); // 5 minutes
+  const inputs = useRef<(RNTextInput | null)[]>([]);
 
-  const inputs = useRef<(TextInput | null)[]>([]);
-
+  // Retrieve stored email
   useEffect(() => {
-    // Get email from AsyncStorage
     AsyncStorage.getItem('email').then(stored => {
       if (stored) setEmail(stored);
     });
   }, []);
 
+  // Countdown timer for resend
   useEffect(() => {
     if (resendTimer <= 0) return;
     const interval = setInterval(() => {
@@ -42,6 +48,7 @@ const EmailVerification = () => {
     return () => clearInterval(interval);
   }, [resendTimer]);
 
+  // Handle OTP change per input
   const handleOtpChange = (text: string, index: number) => {
     const newOtpArr = [...otp];
     newOtpArr[index] = text;
@@ -49,23 +56,28 @@ const EmailVerification = () => {
 
     const joined = newOtpArr.join('');
     const number = parseInt(joined, 10);
-    setNewOtp(number);
+    setNewOtp(isNaN(number) ? null : number);
 
     if (text && index < 5) {
       inputs.current[index + 1]?.focus();
     }
   };
 
-  const handleKeyPress = (e: any, index: number) => {
+  // Handle backspace
+  const handleKeyPress = (
+    e: NativeSyntheticEvent<TextInputKeyPressEventData>,
+    index: number,
+  ) => {
     if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
       inputs.current[index - 1]?.focus();
     }
   };
 
+  // Verify OTP
   const verifyOtp = async () => {
     const storedHash = await AsyncStorage.getItem('otpHash');
     if (!storedHash) {
-      Toast.show({type: 'error', text1: 'Error', text2: 'No OTP hash found'});
+      Toast.show({ type: 'error', text1: 'Error', text2: 'No OTP hash found' });
       return;
     }
 
@@ -73,8 +85,8 @@ const EmailVerification = () => {
       'https://api.reparv.in/territoryapp/client/verify-otp',
       {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({email, otp: newOtp, hash: storedHash}),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp: newOtp, hash: storedHash }),
       },
     );
 
@@ -96,20 +108,21 @@ const EmailVerification = () => {
     }
   };
 
+  // Resend OTP
   const handleResendOtp = async () => {
     try {
       const res = await fetch(
         `https://api.reparv.in/territoryapp/client/send-otp/${email}`,
         {
           method: 'GET',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
         },
       );
 
       if (!res.ok) throw new Error('Failed to resend OTP');
       const data = await res.json();
       await AsyncStorage.setItem('otpHash', data.hash);
-      setResendTimer(300); // Reset timer
+      setResendTimer(300);
 
       Toast.show({
         type: 'success',
@@ -126,12 +139,7 @@ const EmailVerification = () => {
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: 'white',
-        justifyContent: 'space-between',
-      }}>
+    <View style={styles.main}>
       <View style={styles.container}>
         <View style={styles.infoContainer}>
           <Text style={styles.checkEmail}>Check your email</Text>
@@ -141,11 +149,32 @@ const EmailVerification = () => {
           </Text>
         </View>
 
-        <View style={styles.codeContainer}>
+        {/* <View style={styles.codeContainer}>
           {[...Array(6)].map((_, index) => (
             <TextInput
               key={index}
               ref={ref => (inputs.current[index] = ref)}
+              style={styles.codeBox}
+              keyboardType="number-pad"
+              maxLength={1}
+              value={otp[index]}
+              onChangeText={text => handleOtpChange(text, index)}
+              onKeyPress={e => handleKeyPress(e, index)}
+              textContentType="oneTimeCode"
+              autoFocus={index === 0}
+              returnKeyType="next"
+              keyboardAppearance="light"
+            />
+          ))}
+        </View> */}
+
+        <View style={styles.codeContainer}>
+          {[...Array(6)].map((_, index) => (
+            <TextInput
+              key={index}
+              ref={(ref: TextInput | null) => {
+                inputs.current[index] = ref;
+              }}
               style={styles.codeBox}
               keyboardType="number-pad"
               maxLength={1}
@@ -157,7 +186,9 @@ const EmailVerification = () => {
         </View>
 
         <TouchableOpacity disabled={resendTimer > 0} onPress={handleResendOtp}>
-          <Text style={[styles.resendText, resendTimer > 0 && {color: '#aaa'}]}>
+          <Text
+            style={[styles.resendText, resendTimer > 0 && { color: '#aaa' }]}
+          >
             {resendTimer > 0
               ? `Resend available in ${Math.floor(resendTimer / 60)
                   .toString()
@@ -175,6 +206,7 @@ const EmailVerification = () => {
       <TouchableOpacity style={styles.button} onPress={verifyOtp}>
         <Text style={styles.buttonText}>Verify OTP</Text>
       </TouchableOpacity>
+
       <Toast config={toastConfig} />
     </View>
   );
@@ -183,6 +215,11 @@ const EmailVerification = () => {
 export default EmailVerification;
 
 const styles = StyleSheet.create({
+  main: {
+    flex: 1,
+    backgroundColor: 'white',
+    justifyContent: 'space-between',
+  },
   container: {
     flex: 1,
     paddingHorizontal: 25,
@@ -235,12 +272,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   button: {
-    display: 'flex',
     height: 49,
     width: '90%',
-    margin: 'auto',
     marginBottom: 20,
-    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#0078DB',

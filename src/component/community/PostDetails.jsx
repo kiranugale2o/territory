@@ -32,7 +32,9 @@ const PostDetailScreen = ({ route }) => {
           />
           <View>
             <Text style={styles.name}>{post.fullname}</Text>
-            <Text style={styles.timeAgo}>{dayjs(post.created_at).fromNow()}</Text>
+            <Text style={styles.timeAgo}>
+              {dayjs(post.created_at).fromNow()}
+            </Text>
           </View>
         </View>
         {post.city && <Text style={styles.city}>{post.city}</Text>}
@@ -63,7 +65,9 @@ const PostDetailScreen = ({ route }) => {
             <Path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
           </Svg>
         </TouchableOpacity>
-        <Text style={styles.likeCount}>{post.likes} {post.likes === 1 ? 'like' : 'likes'}</Text>
+        <Text style={styles.likeCount}>
+          {post.likes} {post.likes === 1 ? 'like' : 'likes'}
+        </Text>
       </View>
 
       {/* ── Caption ───────────────────────── */}

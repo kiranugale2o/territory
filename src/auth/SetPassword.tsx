@@ -1,5 +1,5 @@
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import React, {useState} from 'react';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,16 +9,16 @@ import {
   Dimensions,
   Alert,
 } from 'react-native';
-import {RootStackParamList} from '../types';
-import {useNavigation} from '@react-navigation/native';
+import { RootStackParamList } from '../types';
+import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Eye, EyeOff, Icon} from 'lucide-react-native';
+import { Eye, EyeOff, Icon } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 
 import PasswordChangedSuccess from './PasswordChangedSuccess';
-import {toastConfig} from '../utils';
+import { toastConfig } from '../utils';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const SetNewPassword = () => {
   const [password, setPassword] = useState('');
@@ -61,7 +61,7 @@ const SetNewPassword = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({email, newPassword: confirmPassword}),
+          body: JSON.stringify({ email, newPassword: confirmPassword }),
         },
       );
 
@@ -96,7 +96,8 @@ const SetNewPassword = () => {
         flex: 1,
         backgroundColor: 'white',
         justifyContent: 'space-between',
-      }}>
+      }}
+    >
       <View style={styles.container}>
         {/* Heading */}
         <Text style={styles.heading}>Set a new password</Text>
@@ -123,7 +124,8 @@ const SetNewPassword = () => {
           />
           <TouchableOpacity
             style={styles.iconWrapper}
-            onPress={() => setShowPassword(!showPassword)}>
+            onPress={() => setShowPassword(!showPassword)}
+          >
             {/* <Icon
               name={showPassword ? 'eye-off' : 'eye'}
               size={22}
@@ -137,7 +139,7 @@ const SetNewPassword = () => {
           </TouchableOpacity>
         </View>
         {/* Confirm Password Label */}
-        <Text style={[styles.label, {marginTop: 20}]}>Confirm Password</Text>
+        <Text style={[styles.label, { marginTop: 20 }]}>Confirm Password</Text>
 
         {/* Confirm Password Input */}
 
@@ -152,7 +154,8 @@ const SetNewPassword = () => {
           />
           <TouchableOpacity
             style={styles.iconWrapper}
-            onPress={() => setConfirmShowPassword(!confirmshowPassword)}>
+            onPress={() => setConfirmShowPassword(!confirmshowPassword)}
+          >
             {showPassword ? (
               <Eye color={'gray'} size={15} />
             ) : (

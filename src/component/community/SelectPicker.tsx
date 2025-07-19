@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -67,12 +67,14 @@ const CustomPicker: React.FC<CustomPickerProps> = ({
       <TouchableOpacity
         style={styles.dropdownButton}
         onPress={() => setModalVisible(true)}
-        activeOpacity={0.7}>
+        activeOpacity={0.7}
+      >
         <Text
           style={[
             styles.selectedText,
-            {color: item.name === 'status' ? selectedColor : '#333'},
-          ]}>
+            { color: item.name === 'status' ? selectedColor : '#333' },
+          ]}
+        >
           {selectedLabel}
         </Text>
       </TouchableOpacity>
@@ -80,23 +82,28 @@ const CustomPicker: React.FC<CustomPickerProps> = ({
       <Modal transparent visible={modalVisible} animationType="fade">
         <Pressable
           style={styles.backdrop}
-          onPress={() => setModalVisible(false)}>
+          onPress={() => setModalVisible(false)}
+        >
           <View style={styles.modalContent}>
             <FlatList
               data={item.options || []}
               keyExtractor={opt => opt.value}
-              renderItem={({item: opt}) => (
+              renderItem={({ item: opt }) => (
                 <TouchableOpacity
                   style={styles.optionItem}
-                  onPress={() => onSelect(opt.value)}>
+                  onPress={() => onSelect(opt.value)}
+                >
                   <Text
-                    style={[styles.optionText, {color: opt.color || '#000'}]}>
+                    style={[styles.optionText, { color: opt.color || '#000' }]}
+                  >
                     {opt.label}
                   </Text>
                 </TouchableOpacity>
               )}
               ListHeaderComponent={() => (
-                <Text style={[styles.optionText, {color: '#999', padding: 8}]}>
+                <Text
+                  style={[styles.optionText, { color: '#999', padding: 8 }]}
+                >
                   {item.placeHolder}
                 </Text>
               )}

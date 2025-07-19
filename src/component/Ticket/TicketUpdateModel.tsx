@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   Modal,
@@ -9,8 +9,8 @@ import {
   View,
 } from 'react-native';
 import CustomPicker from '../CustomPicker';
-import {Picker} from '@react-native-picker/picker';
-import {X} from 'lucide-react-native';
+import { Picker } from '@react-native-picker/picker';
+import { X } from 'lucide-react-native';
 
 interface TicketUpdateProp {
   visible: boolean;
@@ -25,7 +25,7 @@ interface TicketUpdateProp {
     adminid: string;
     departmentid: string;
     employeeid: string;
-    ticketId: any;
+    ticketId: string;
   };
 }
 
@@ -36,33 +36,49 @@ interface NewTicket {
   issue: string;
   details: string;
 }
+
+interface Admin {
+  id: string;
+  name: string;
+}
+
+interface Department {
+  departmentid: string;
+  department: string;
+}
+
+interface Employee {
+  id: string;
+  name: string;
+}
+
 const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
   visible,
   onClose,
   ticketData,
 }) => {
   const [newTicket, setNewTicketData] = useState<NewTicket>({
-    adminid: ticketData.adminid,
-    departmentid: ticketData.departmentid,
-    employeeid: ticketData.employeeid,
-    issue: ticketData.issue,
-    details: ticketData.description,
+    adminid: ticketData?.adminid,
+    departmentid: ticketData?.departmentid,
+    employeeid: ticketData?.employeeid,
+    issue: ticketData?.issue,
+    details: ticketData?.description,
   });
 
   useEffect(() => {
     setNewTicketData({
-      adminid: ticketData.adminid,
-      departmentid: ticketData.departmentid,
-      employeeid: ticketData.employeeid,
-      issue: ticketData.issue,
-      details: ticketData.description,
+      adminid: ticketData?.adminid,
+      departmentid: ticketData?.departmentid,
+      employeeid: ticketData?.employeeid,
+      issue: ticketData?.issue,
+      details: ticketData?.description,
     });
   }, [visible]);
 
   const options = [
-    {label: 'Technical Issue', value: 'Technical Issue'},
-    {label: 'Commission Issue', value: 'Commission Issue'},
-    {label: 'Lead Issue', value: 'Lead Issue'},
+    { label: 'Technical Issue', value: 'Technical Issue' },
+    { label: 'Commission Issue', value: 'Commission Issue' },
+    { label: 'Lead Issue', value: 'Lead Issue' },
   ];
 
   interface Admin {
@@ -71,8 +87,8 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
   }
 
   const [adminData, setAdminData] = useState<Admin[]>([]);
-  const [departmentData, setDepartmentData] = useState([]);
-  const [employeeData, setEmployeeData] = useState([]);
+  const [departmentData, setDepartmentData] = useState<Department[]>([]);
+  const [employeeData, setEmployeeData] = useState<Employee[]>([]);
   const [isFocused, setIsFocused] = useState(false);
 
   //Fetch department data
@@ -110,7 +126,6 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
   useEffect(() => {
     if (newTicket.departmentid) {
       fetchEmployeeData(newTicket.departmentid);
-      console.log(newTicket.departmentid, 'dddddddddd');
     }
   }, [newTicket.departmentid]);
 
@@ -161,11 +176,19 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
     fetchDepartmentData();
   }, []);
 
+  // useEffect(() => {
+  //   if (!newTicket.adminid && adminData.length > 0) {
+  //     setNewTicketData(prev => ({
+  //       ...prev,
+  //       adminid: adminData[0].id,
+  //     }));
+  //   }
+  // }, [adminData]);
   useEffect(() => {
-    if (!newTicket.adminid && adminData.length > 0) {
+    if (adminData.length > 0 && newTicket.adminid === '') {
       setNewTicketData(prev => ({
         ...prev,
-        adminid: adminData[0].id,
+        adminid: adminData[0].id.toString(), // Convert to match type if needed
       }));
     }
   }, [adminData]);
@@ -180,7 +203,7 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
         {
           method: 'PUT',
           credentials: 'include',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newTicket),
         },
       );
@@ -211,14 +234,16 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
       transparent
       visible={visible}
       animationType="slide"
-      onRequestClose={onClose}>
+      onRequestClose={onClose}
+    >
       <View
         style={{
           flex: 1,
           backgroundColor: 'rgba(0,0,0,0.4)',
           justifyContent: 'center',
           alignItems: 'center',
-        }}>
+        }}
+      >
         <View
           style={{
             backgroundColor: 'white',
@@ -226,20 +251,23 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
             padding: 30,
             width: '95%',
             elevation: 5,
-          }}>
+          }}
+        >
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-            }}>
+            }}
+          >
             <Text
               style={{
                 fontSize: 18,
                 fontWeight: 'bold',
                 marginBottom: 16,
                 textAlign: 'center',
-                 color:'black'
-              }}>
+                color: 'black',
+              }}
+            >
               Ticket Details
             </Text>
             <TouchableOpacity onPress={onClose}>
@@ -253,7 +281,8 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
               marginTop: 10,
               color: '#00000066',
               fontWeight: '500',
-            }}>
+            }}
+          >
             Issue Category
           </Text>
 
@@ -262,19 +291,20 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
             placeholder="Select Issue"
             selectedValue={newTicket.issue}
             onValueChange={value => {
-              setNewTicketData({...newTicket, issue: value});
+              setNewTicketData({ ...newTicket, issue: value });
             }}
             options={options}
             mytype={false}
           />
 
-          <View style={{width: '100%', marginTop: 10}}>
+          <View style={{ width: '100%', marginTop: 10 }}>
             <Text
               style={{
                 fontSize: 14,
                 color: '#00000066',
                 fontWeight: '500',
-              }}>
+              }}
+            >
               Select Admin
             </Text>
 
@@ -286,19 +316,21 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
                 // marginTop: 10,
                 backgroundColor:
                   newTicket.departmentid === '' ? '#f2f2f2' : '#fff',
-              }}>
+              }}
+            >
               <Picker
                 selectedValue={newTicket.adminid}
                 // enabled={newTicket.adminid !== '' ? false : true}
                 onValueChange={itemValue =>
-                  setNewTicketData({...newTicket, adminid: itemValue})
+                  setNewTicketData({ ...newTicket, adminid: itemValue })
                 }
                 style={{
                   fontSize: 16,
                   //  paddingVertical: 5,
                   // paddingHorizontal: 8,
                   color: '#000',
-                }}>
+                }}
+              >
                 <Picker.Item label="Select Admin" value="" />
                 {adminData?.map((admin, index) => (
                   <Picker.Item
@@ -311,14 +343,15 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
             </View>
           </View>
 
-          <View style={{width: '100%', marginTop: 10}}>
+          <View style={{ width: '100%', marginTop: 10 }}>
             <Text
               style={{
                 fontSize: 14,
                 // lineHeight: 18,
                 color: '#00000066',
                 fontWeight: '500',
-              }}>
+              }}
+            >
               Department
             </Text>
 
@@ -332,19 +365,21 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
                 borderRadius: 4,
                 backgroundColor:
                   newTicket.adminid !== '' ? '#f0f0f0' : 'transparent',
-              }}>
+              }}
+            >
               <Picker
                 enabled={newTicket.adminid === ''}
                 selectedValue={newTicket.departmentid}
                 onValueChange={itemValue =>
-                  setNewTicketData({...newTicket, departmentid: itemValue})
+                  setNewTicketData({ ...newTicket, departmentid: itemValue })
                 }
                 style={{
                   fontSize: 16,
                   fontWeight: '500',
                   color: '#000',
                   backgroundColor: 'transparent',
-                }}>
+                }}
+              >
                 <Picker.Item label="Select Department" value="" />
                 {departmentData?.map((department, index) => (
                   <Picker.Item
@@ -357,14 +392,15 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
             </View>
           </View>
 
-          <View style={{width: '100%'}}>
+          <View style={{ width: '100%' }}>
             <Text
               style={{
                 fontSize: 14,
                 lineHeight: 18,
                 color: '#00000066',
                 fontWeight: '500',
-              }}>
+              }}
+            >
               Employee
             </Text>
 
@@ -378,19 +414,21 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
                 borderRadius: 4,
                 backgroundColor:
                   newTicket.departmentid === '' ? '#f0f0f0' : 'transparent',
-              }}>
+              }}
+            >
               <Picker
                 enabled={newTicket.departmentid !== ''}
                 selectedValue={newTicket.employeeid}
                 onValueChange={itemValue =>
-                  setNewTicketData({...newTicket, employeeid: itemValue})
+                  setNewTicketData({ ...newTicket, employeeid: itemValue })
                 }
                 style={{
                   fontSize: 16,
                   fontWeight: '500',
                   color: '#000',
                   backgroundColor: 'transparent',
-                }}>
+                }}
+              >
                 <Picker.Item label="Select Employee" value="" />
                 {employeeData?.map((employee, index) => (
                   <Picker.Item
@@ -408,7 +446,8 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
               fontSize: 14,
               color: '#2E2A40',
               marginVertical: 10,
-            }}>
+            }}
+          >
             Ticket Description:
           </Text>
           <TextInput
@@ -430,7 +469,7 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             onChangeText={value =>
-              setNewTicketData({...newTicket, details: value})
+              setNewTicketData({ ...newTicket, details: value })
             }
             multiline
           />
@@ -442,7 +481,8 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
               margin: 'auto',
               flexDirection: 'row',
               justifyContent: 'space-evenly',
-            }}>
+            }}
+          >
             <TouchableOpacity
               onPress={addTicket}
               style={{
@@ -451,12 +491,14 @@ const TicketUpdateModel: React.FC<TicketUpdateProp> = ({
                 width: '50%',
                 margin: 'auto',
                 borderRadius: 10,
-              }}>
+              }}
+            >
               <Text
                 style={{
                   color: 'white',
                   margin: 'auto',
-                }}>
+                }}
+              >
                 Save
               </Text>
             </TouchableOpacity>

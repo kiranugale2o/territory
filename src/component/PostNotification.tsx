@@ -1,14 +1,14 @@
 import React from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
-import Svg, {Path} from 'react-native-svg';
+import { View, Text, StyleSheet, Image } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
 type PostNotificationProps = {
   show: boolean;
 };
 
-const PostNotification: React.FC<PostNotificationProps> = ({show}) => {
+const PostNotification: React.FC<PostNotificationProps> = ({ show }) => {
   return (
-    <View style={[styles.overlay, {display: `${show ? 'flex' : 'none'}`}]}>
+    <View style={[styles.overlay, { display: `${show ? 'flex' : 'none'}` }]}>
       <View style={styles.container}>
         <View style={styles.titleRow}>
           <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 4,

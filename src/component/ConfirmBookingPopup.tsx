@@ -7,9 +7,9 @@ import {
   TouchableOpacity,
   Modal,
 } from 'react-native';
-import {X} from 'lucide-react-native'; // Optional close icon
+import { X } from 'lucide-react-native'; // Optional close icon
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 interface ConfirmBookingPopupProps {
   visible: boolean;
