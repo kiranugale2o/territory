@@ -168,6 +168,7 @@ const Home: React.FC = () => {
     }
   };
 
+  const [contactError, setContactError] = useState('');
   const [overviewData, setOverviewData] = useState([]);
   const [overviewCountData, setOverviewCountData] = useState<DashboardStats>({
     totalDealAmount: 0,
@@ -263,8 +264,28 @@ const Home: React.FC = () => {
     }
   };
 
+  const isValidMobileNumber = (number: string) => {
+    const mobileRegex = /^[6-9]\d{9}$/; // for Indian 10-digit numbers
+    return mobileRegex.test(number);
+  };
+
+  const isFormValid =
+    newEnquiry?.customer?.trim() !== '' &&
+    isValidMobileNumber(newEnquiry?.contact) &&
+    newEnquiry?.category !== '' &&
+    newEnquiry?.minbudget !== null &&
+    newEnquiry?.maxbudget !== null &&
+    newEnquiry?.state !== '' &&
+    newEnquiry?.city !== '' &&
+    newEnquiry?.location?.trim() !== '' &&
+    newEnquiry?.message?.trim() !== '';
+
   const addEnquiry = async () => {
-    console.log(newEnquiry);
+    setNewEnquiry({
+      ...newEnquiry,
+      territoryName: auth?.user?.name ?? '',
+      territoryContact: auth?.user?.contact ?? '',
+    });
     if (newEnquiry.territoryName === '' || newEnquiry.territoryContact === '') {
       setNewEnquiry({
         ...newEnquiry,
@@ -952,8 +973,20 @@ const Home: React.FC = () => {
                   style={[Sstyles.input, { color: 'black' }]}
                   placeholderTextColor={'gray'}
                   value={newEnquiry?.contact}
-                  onChangeText={text => handleEnquiryChange('contact', text)}
+                  onChangeText={text => {
+                    handleEnquiryChange('contact', text);
+                    if (!isValidMobileNumber(text)) {
+                      setContactError('Enter a valid 10-digit mobile number');
+                    } else {
+                      setContactError('');
+                    }
+                  }}
                 />
+                {contactError ? (
+                  <Text style={{ color: 'red', fontSize: 12 }}>
+                    {contactError}
+                  </Text>
+                ) : null}
 
                 <View style={{ width: '100%', marginBottom: 16 }}>
                   <Text
@@ -1021,7 +1054,7 @@ const Home: React.FC = () => {
                   </Text>
                   <View
                     style={{
-                      borderWidth: 1,
+                      borderWidth: 0.5,
                       borderColor: 'gray',
                       borderRadius: 4,
                     }}
@@ -1060,7 +1093,7 @@ const Home: React.FC = () => {
                   </Text>
                   <View
                     style={{
-                      borderWidth: 1,
+                      borderWidth: 0.5,
                       borderColor: 'gray',
                       borderRadius: 4,
                     }}
@@ -1210,7 +1243,19 @@ const Home: React.FC = () => {
                   >
                     <Text style={Sstyles.buttonText}>Cancel</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={Sstyles.save} onPress={addEnquiry}>
+                  <TouchableOpacity
+                    style={[Sstyles.save, { opacity: isFormValid ? 1 : 0.5 }]}
+                    disabled={!isFormValid}
+                    onPress={() => {
+                      if (!isValidMobileNumber(newEnquiry.contact)) {
+                        setContactError(
+                          'Please enter a valid 10-digit mobile number',
+                        );
+                        return;
+                      }
+                      addEnquiry();
+                    }}
+                  >
                     <Text style={Sstyles.buttonText}>Save</Text>
                   </TouchableOpacity>
                 </View>
