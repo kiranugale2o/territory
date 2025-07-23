@@ -480,6 +480,7 @@ const BookingClientInfoCard = ({ data }) => {
                 borderColor: '#ccc',
                 borderRadius: 10,
                 padding: 12,
+                color: 'black',
                 marginBottom: 12,
               }}
             />

@@ -27,7 +27,17 @@ import { AuthContext, AuthProvider } from '../../context/AuthContext';
 import Toast from 'react-native-toast-message';
 import { Picker } from '@react-native-picker/picker';
 import Loader from '../../component/loader';
-import { FilterIcon, SearchIcon, X } from 'lucide-react-native';
+import {
+  FilterIcon,
+  IndianRupee,
+  MessageSquare,
+  Ruler,
+  SearchIcon,
+  ThumbsUp,
+  Ticket,
+  Wallet,
+  X,
+} from 'lucide-react-native';
 import EnquiryCustomeDatePicker from '../../component/EnquiryCustomeDatePicker';
 import { isValid, isWithinInterval, parse } from 'date-fns';
 import { MeetingFollowUp } from '../Calender';
@@ -80,6 +90,9 @@ const Home: React.FC = () => {
   const [lastOffset, setLastOffset] = useState(0); // Last scroll position to track direction
   const [selectedValue, setSelectedValue] = useState('visit');
   const [modalVisible, setModalVisible] = useState(false);
+  const [nameError, setNameError] = useState('');
+  const [locationError, setLocationError] = useState('');
+  const [messageError, setMessageError] = useState('');
 
   // Calculate the Inquiry Section height dynamically based on scroll position
   const inquiryHeight = scrollY.interpolate({
@@ -160,6 +173,13 @@ const Home: React.FC = () => {
       }
 
       const data = await response.json();
+      const newStatusCount = data.filter(
+        (item: any) => item.territorystatus === 'New',
+      ).length;
+
+      if (newStatusCount !== 0) {
+        auth?.setNotification(true);
+      }
       setEnquiries(data);
     } catch (error) {
       console.error('API call failed:', error);
@@ -264,21 +284,30 @@ const Home: React.FC = () => {
     }
   };
 
+  const isValidName = (name: string) => /^[A-Za-z\s]+$/.test(name.trim());
+
+  const isValidLocation = (location: string) =>
+    /^[A-Za-z0-9\s,.-]+$/.test(location.trim()) && !/\d{5,}/.test(location); // prevents large numbers (e.g., pins)
+
+  const isValidMessage = (message: string) =>
+    /^[A-Za-z0-9\s,.'"-?!@()&:]+$/.test(message.trim()) &&
+    !/^\d+$/.test(message.trim()); // not pure numbers
+
   const isValidMobileNumber = (number: string) => {
     const mobileRegex = /^[6-9]\d{9}$/; // for Indian 10-digit numbers
     return mobileRegex.test(number);
   };
 
   const isFormValid =
-    newEnquiry?.customer?.trim() !== '' &&
+    isValidName(newEnquiry?.customer) &&
     isValidMobileNumber(newEnquiry?.contact) &&
     newEnquiry?.category !== '' &&
     newEnquiry?.minbudget !== null &&
     newEnquiry?.maxbudget !== null &&
     newEnquiry?.state !== '' &&
     newEnquiry?.city !== '' &&
-    newEnquiry?.location?.trim() !== '' &&
-    newEnquiry?.message?.trim() !== '';
+    newEnquiry?.location.trim() !== '' &&
+    newEnquiry?.message.trim() !== '';
 
   const addEnquiry = async () => {
     setNewEnquiry({
@@ -566,147 +595,126 @@ const Home: React.FC = () => {
       {/* Cards Section */}
       <Animated.View
         style={{
-          // marginTop: 10,
-          display: `${showCards ? 'flex' : 'none'}`,
+          //marginTop: 10,
+          display: showCards ? 'flex' : 'none',
         }}
       >
         <View
           style={{
-            width: '100%',
-            height: 150,
+            width: '85%',
+            backgroundColor: '#fff',
+            borderRadius: 12,
+            padding: 6,
+            margin: 'auto',
             shadowColor: '#000',
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.3,
-            shadowRadius: 6,
-            elevation: 1, // Android shadow
-            backgroundColor: 'white', // Needed to see shadow
-            borderRadius: 8, // Optional: soft corners
-            // marginVertical: 10, // spacing around
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 3,
           }}
         >
           <ScrollView
             style={{
               width: '100%',
-              height: 250,
+              // height: 250,
             }}
           >
-            <View style={styles.box1}>
-              <LinearGradient
-                colors={['#0078DB', '#004170']}
-                start={{ x: 1, y: 0 }}
-                end={{ x: 0.5, y: 0.5 }}
-                style={styles.card}
-              >
-                <View style={styles.content}>
-                  <Text style={styles.label}>Total Deal Amount</Text>
-                  <View style={styles.iconWrapper}>
-                    <Image
-                      source={require('../../../assets/icons/rs.png')}
-                      style={styles.vectorInner}
-                    />
-                  </View>
-                </View>
-                <Text style={styles.amount}>
-                  ₹{formatIndianAmount(overviewCountData?.totalDealAmount)}
-                </Text>
-              </LinearGradient>
-              {/* Card 1: No. of Deal Done */}
-              <LinearGradient
-                colors={['#0078DB', '#004170']}
-                start={{ x: 1, y: 0 }}
-                end={{ x: 0.5, y: 0.5 }}
-                style={styles.card}
-              >
-                <View style={styles.content}>
-                  <Text style={styles.label}>No. of Deal Done</Text>
-                  <View style={styles.iconWrapper}>
-                    <Image
-                      source={require('../../../assets/icons/like.png')}
-                      style={styles.vectorInner}
-                    />
-                  </View>
-                </View>
-                <Text style={styles.amount}>0</Text>
-              </LinearGradient>
-            </View>
-            <View style={styles.box2}>
-              {/* Card 2: Self Earning */}
-              <LinearGradient
-                colors={['#0078DB', '#004170']}
-                start={{ x: 1, y: 0 }}
-                end={{ x: 0.5, y: 0.5 }}
-                style={styles.card}
-              >
-                <View style={styles.content}>
-                  <View style={{ flexDirection: 'column' }}>
-                    <Text style={styles.label}>Self Earning</Text>
-                    <Text style={[styles.label]}>Amount</Text>
-                  </View>
-                  <View style={styles.iconWrapper}>
-                    <Image
-                      source={require('../../../assets/icons/pr.png')}
-                      style={styles.vectorInner}
-                    />
-                  </View>
-                </View>
-                <Text style={styles.amount}>
-                  ₹{formatIndianAmount(overviewCountData?.selfEarning)}
-                </Text>
-              </LinearGradient>
-
-              {/* Card 3: Deal in Sq. Ft. */}
-              <LinearGradient
-                colors={['#0078DB', '#004170']}
-                start={{ x: 1, y: 0 }}
-                end={{ x: 0.5, y: 0.5 }}
-                style={styles.card}
-              >
-                <View style={styles.content}>
-                  <Text style={styles.label}>Deal in Sq. Ft.</Text>
-                  <View style={styles.iconWrapper}>
-                    <Image
-                      source={require('../../../assets/icons/map.png')}
-                      style={styles.vectorInner}
-                    />
-                  </View>
-                </View>
-                <Text style={styles.amount}>
-                  {overviewCountData?.totalDealInSquareFeet} Sq. Ft.
-                </Text>
-              </LinearGradient>
-            </View>
-            <View style={styles.box2}>
-              <LinearGradient
-                colors={['#0078DB', '#004170']}
-                start={{ x: 1, y: 0 }}
-                end={{ x: 0.5, y: 0.5 }}
-                style={styles.card}
-              >
-                <View style={styles.content}>
-                  <Text style={styles.label}>No of Enquiry</Text>
-                </View>
-                <Text style={styles.amount}>{enquiries.length}</Text>
-              </LinearGradient>
-              {/* Card 1: No. of Deal Done */}
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate('Tickets');
-                }}
-              >
-                <LinearGradient
-                  colors={['#0078DB', '#004170']}
-                  start={{ x: 1, y: 0 }}
-                  end={{ x: 0.5, y: 0.5 }}
-                  style={styles.card}
-                >
+            <View style={{ width: '100%', gap: 0 }}>
+              <View style={styles.box1}>
+                {/* Card 1 */}
+                <View style={styles.card}>
                   <View style={styles.content}>
-                    <Text style={styles.label}>Total Tickets</Text>
+                    <View>
+                      <Text style={styles.label}>Total Deal Amount</Text>
+                      <Text style={styles.percent}>(100%)</Text>
+                    </View>
+                    <View style={styles.iconWrapper}>
+                      <IndianRupee size={24} color="white" />
+                    </View>
                   </View>
                   <Text style={styles.amount}>
-                    {overviewCountData?.totalTicket}
+                    ₹{formatIndianAmount(overviewCountData?.totalDealAmount)}
                   </Text>
-                </LinearGradient>
-              </TouchableOpacity>
+                </View>
+
+                {/* Card 2 */}
+                <View style={styles.card}>
+                  <View style={styles.content}>
+                    <View>
+                      <Text style={styles.label}>No. of Deal Done</Text>
+                      <Text style={styles.percent}>(100%)</Text>
+                    </View>
+                    <View style={styles.iconWrapper}>
+                      <ThumbsUp size={24} color="white" />
+                    </View>
+                  </View>
+                  <Text style={styles.amount}>0</Text>
+                </View>
+              </View>
+
+              <View style={styles.box1}>
+                {/* Card 3 */}
+                <View style={styles.card}>
+                  <View style={styles.content}>
+                    <View>
+                      <Text style={styles.label}>Self Earning</Text>
+                      <Text style={styles.label}>Amount</Text>
+                    </View>
+                    <View style={styles.iconWrapper}>
+                      <Wallet size={24} color="white" />
+                    </View>
+                  </View>
+                  <Text style={styles.amount}>
+                    ₹{formatIndianAmount(overviewCountData?.selfEarning)}
+                  </Text>
+                </View>
+
+                {/* Card 4 */}
+                <View style={styles.card}>
+                  <View style={styles.content}>
+                    <Text style={styles.label}>Deal in Sq. Ft.</Text>
+                    <View style={styles.iconWrapper}>
+                      <Ruler size={24} color="white" />
+                    </View>
+                  </View>
+                  <Text style={styles.amount}>
+                    {overviewCountData?.totalDealInSquareFeet} Sq. Ft.
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.box1}>
+                {/* Card 5 */}
+                <View style={styles.card}>
+                  <View style={styles.content}>
+                    <Text style={styles.label}>No of Enquiry</Text>
+                    <View style={styles.iconWrapper}>
+                      <MessageSquare size={24} color="white" />
+                    </View>
+                  </View>
+                  <Text style={styles.amount}>{enquiries.length}</Text>
+                </View>
+
+                {/* Card 6 */}
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate('Tickets');
+                  }}
+                  style={styles.card}
+                >
+                  <View>
+                    <View style={styles.content}>
+                      <Text style={styles.label}>Total Tickets</Text>
+                      <View style={styles.iconWrapper}>
+                        <Ticket size={24} color="white" />
+                      </View>
+                    </View>
+                    <Text style={styles.amount}>
+                      {overviewCountData.totalTicket}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
             </View>
           </ScrollView>
         </View>
@@ -721,13 +729,13 @@ const Home: React.FC = () => {
           zIndex: 0,
         }}
       >
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => {
             navigation.navigate('ViewSchedule');
           }}
         >
           <Text style={[styles.text, { padding: 10 }]}>View Schedule</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Animated Inquiry Section */}
         <Animated.View style={[styles.frameContainer]}>
@@ -931,7 +939,7 @@ const Home: React.FC = () => {
         </View>
       </Modal>
       {/* Add Enquiry Model */}
-      <Modal transparent visible={addEnquiryVisible} animationType="slide">
+      {/* <Modal transparent visible={addEnquiryVisible} animationType="slide">
         <View style={Sstyles.overlay}>
           <View style={Sstyles.modal}>
             <View
@@ -1263,6 +1271,402 @@ const Home: React.FC = () => {
             </ScrollView>
           </View>
         </View>
+      </Modal> */}
+
+      <Modal transparent visible={addEnquiryVisible} animationType="slide">
+        <View style={Sstyles.overlay}>
+          <View style={Sstyles.modal}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Text style={Sstyles.title}>Add Enquiry Details</Text>
+              <X
+                size={30}
+                color={'gray'}
+                onPress={() => {
+                  setaddEnquiryVisible(false);
+                }}
+              />
+            </View>
+            <View
+              style={{
+                width: '100%',
+                borderWidth: 0.2,
+                backgroundColor: 'black',
+                height: 0.5,
+              }}
+            ></View>
+
+            <ScrollView style={{ height: 500 }}>
+              <View style={{ gap: 16, padding: 12 }}>
+                <Text style={{ fontSize: 14, color: 'gray' }}>Full Name</Text>
+                <TextInput
+                  style={[Sstyles.input, { color: 'black' }]}
+                  placeholder="Enter full name"
+                  placeholderTextColor={'gray'}
+                  value={newEnquiry?.customer}
+                  onChangeText={text => {
+                    handleEnquiryChange('customer', text);
+                    if (!isValidName(text)) {
+                      setNameError(
+                        'Name should only contain letters and spaces',
+                      );
+                    } else {
+                      setNameError('');
+                    }
+                  }}
+                />
+                {nameError ? (
+                  <Text style={{ fontSize: 12, color: 'red' }}>
+                    {nameError}
+                  </Text>
+                ) : null}
+
+                <Text style={{ fontSize: 14, color: 'gray' }}>
+                  Contact Number
+                </Text>
+                <TextInput
+                  style={[Sstyles.input, { color: 'black' }]}
+                  value={newEnquiry?.contact}
+                  keyboardType="numeric"
+                  maxLength={10}
+                  placeholder="Enter 10-digit mobile number"
+                  placeholderTextColor={'gray'}
+                  onChangeText={text => {
+                    handleEnquiryChange('contact', text);
+                    if (!isValidMobileNumber(text)) {
+                      setContactError('Enter a valid 10-digit mobile number');
+                    } else {
+                      setContactError('');
+                    }
+                  }}
+                />
+                {contactError ? (
+                  <Text style={{ fontSize: 12, color: 'red' }}>
+                    {contactError}
+                  </Text>
+                ) : null}
+
+                <View style={{ width: '100%', marginBottom: 16 }}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: '500',
+                      color: '#00000066',
+                    }}
+                  >
+                    Property Category
+                  </Text>
+                  <View
+                    style={{
+                      marginTop: 10,
+                      borderWidth: 0.5,
+                      borderColor: '#00000033',
+                      borderRadius: 4,
+                      backgroundColor: '#fff',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <Picker
+                      selectedValue={newEnquiry.category}
+                      onValueChange={itemValue =>
+                        handleEnquiryChange('category', itemValue)
+                      }
+                      style={{
+                        height: 50,
+                        fontSize: 16,
+                        fontWeight: '500',
+                        color: 'black',
+                      }}
+                    >
+                      <Picker.Item label="Select Property Category" value="" />
+                      <Picker.Item label="New Flat" value="NewFlat" />
+                      <Picker.Item label="New Plot" value="NewPlot" />
+                      <Picker.Item label="Rental Flat" value="RentalFlat" />
+                      <Picker.Item label="Rental Shop" value="RentalShop" />
+                      <Picker.Item label="Rental Office" value="RentalOffice" />
+                      <Picker.Item label="Resale" value="Resale" />
+                      <Picker.Item label="Row House" value="RowHouse" />
+                      <Picker.Item label="Lease" value="Lease" />
+                      <Picker.Item label="Farm Land" value="FarmLand" />
+                      <Picker.Item label="Farm House" value="FarmHouse" />
+                      <Picker.Item
+                        label="Commercial Flat"
+                        value="CommercialFlat"
+                      />
+                      <Picker.Item
+                        label="Commercial Plot"
+                        value="CommercialPlot"
+                      />
+                      <Picker.Item
+                        label="Industrial Space"
+                        value="IndustrialSpace"
+                      />
+                    </Picker>
+                  </View>
+                </View>
+
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ fontSize: 14, color: 'gray' }}>
+                    Min-Budget
+                  </Text>
+                  <View
+                    style={{
+                      borderWidth: 0.5,
+                      borderColor: '#00000033',
+                      borderRadius: 4,
+                    }}
+                  >
+                    <Picker
+                      style={{ color: 'black' }}
+                      selectedValue={newEnquiry.minbudget}
+                      onValueChange={value => {
+                        setNewEnquiry({
+                          ...newEnquiry,
+                          minbudget: value,
+                          maxbudget:
+                            value != null &&
+                            newEnquiry.maxbudget != null &&
+                            newEnquiry.maxbudget <= value
+                              ? null
+                              : newEnquiry.maxbudget,
+                        });
+                      }}
+                    >
+                      <Picker.Item label="Select Min Budget..." value={null} />
+                      {currentMinBudgetOptions.map(option => (
+                        <Picker.Item
+                          key={option.value}
+                          label={option.label}
+                          value={option.value}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+                </View>
+
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ fontSize: 14, color: 'gray' }}>
+                    Max-Budget
+                  </Text>
+                  <View
+                    style={{
+                      borderWidth: 0.5,
+                      borderColor: '#00000033',
+                      borderRadius: 4,
+                    }}
+                  >
+                    <Picker
+                      style={{ color: 'black' }}
+                      enabled={filteredMaxOptions.length > 0}
+                      selectedValue={newEnquiry.maxbudget}
+                      onValueChange={value =>
+                        setNewEnquiry({
+                          ...newEnquiry,
+                          maxbudget: value,
+                        })
+                      }
+                    >
+                      <Picker.Item
+                        label={
+                          filteredMaxOptions.length > 0
+                            ? 'Select Max Budget...'
+                            : 'No higher options available'
+                        }
+                        value={null}
+                      />
+                      {filteredMaxOptions.map(option => (
+                        <Picker.Item
+                          key={option.value}
+                          label={option.label}
+                          value={option.value}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+                </View>
+
+                <View style={{ width: '100%', marginBottom: 16 }}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: '500',
+                      color: '#00000066',
+                    }}
+                  >
+                    Select State
+                  </Text>
+                  <View
+                    style={{
+                      marginTop: 10,
+                      borderWidth: 1,
+                      borderColor: '#00000033',
+                      borderRadius: 4,
+                      backgroundColor: '#fff',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <Picker
+                      selectedValue={newEnquiry.state}
+                      onValueChange={itemValue =>
+                        handleEnquiryChange('state', itemValue)
+                      }
+                      style={{
+                        height: 50,
+                        fontSize: 16,
+                        fontWeight: '500',
+                        color: 'black',
+                      }}
+                    >
+                      <Picker.Item label="Select Your State" value="" />
+                      {states?.map((state, index) => (
+                        <Picker.Item
+                          key={index}
+                          label={state?.state}
+                          value={state?.state}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+                </View>
+
+                <View style={{ width: '100%', marginBottom: 16 }}>
+                  <Text
+                    style={{ fontSize: 14, fontWeight: '500', color: 'gray' }}
+                  >
+                    Select City
+                  </Text>
+                  <View
+                    style={{
+                      marginTop: 10,
+                      borderWidth: 1,
+                      borderColor: '#00000033',
+                      borderRadius: 4,
+                      backgroundColor: '#fff',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <Picker
+                      selectedValue={newEnquiry.city}
+                      onValueChange={itemValue =>
+                        handleEnquiryChange('city', itemValue)
+                      }
+                      style={{
+                        height: 50,
+                        fontSize: 16,
+                        fontWeight: '500',
+                        color: 'black',
+                      }}
+                    >
+                      <Picker.Item label="Select Your City" value="" />
+                      {cities?.map((city, index) => (
+                        <Picker.Item
+                          key={index}
+                          label={city?.city}
+                          value={city?.city}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+                </View>
+
+                <Text style={{ fontSize: 14, color: 'gray' }}>Location</Text>
+                <TextInput
+                  style={[Sstyles.input, { color: 'black' }]}
+                  placeholder="Enter location"
+                  placeholderTextColor={'gray'}
+                  value={newEnquiry?.location}
+                  onChangeText={text => {
+                    handleEnquiryChange('location', text);
+                    if (!text.trim()) {
+                      setLocationError('Location cannot be empty');
+                    } else {
+                      setLocationError('');
+                    }
+                  }}
+                />
+                {locationError ? (
+                  <Text style={{ fontSize: 12, color: 'red' }}>
+                    {locationError}
+                  </Text>
+                ) : null}
+                <Text style={{ fontSize: 14, color: 'gray' }}>Message</Text>
+                <TextInput
+                  style={[Sstyles.input, { color: 'black' }]}
+                  placeholder="Enter your message"
+                  placeholderTextColor={'gray'}
+                  value={newEnquiry?.message}
+                  onChangeText={text => {
+                    handleEnquiryChange('message', text);
+                    if (!text.trim()) {
+                      setMessageError('Message cannot be empty');
+                    } else {
+                      setMessageError('');
+                    }
+                  }}
+                />
+                {messageError ? (
+                  <Text style={{ fontSize: 12, color: 'red' }}>
+                    {messageError}
+                  </Text>
+                ) : null}
+
+                {/* Optional All fields required message */}
+                {(newEnquiry?.category === '' ||
+                  newEnquiry?.city === '' ||
+                  newEnquiry?.contact === '' ||
+                  newEnquiry?.customer === '' ||
+                  newEnquiry?.location === '' ||
+                  newEnquiry?.maxbudget === null ||
+                  newEnquiry?.minbudget === null ||
+                  newEnquiry?.message === '' ||
+                  newEnquiry?.state === '') && (
+                  <Text style={{ fontSize: 14, color: 'red' }}>
+                    All Values Are Required*
+                  </Text>
+                )}
+
+                <View style={Sstyles.buttonContainer}>
+                  <TouchableOpacity
+                    style={Sstyles.cancel}
+                    onPress={() => {
+                      setNewEnquiry({
+                        customer: '',
+                        contact: '',
+                        minbudget: null,
+                        maxbudget: null,
+                        category: '',
+                        state: '',
+                        city: '',
+                        location: '',
+                        message: '',
+                        territoryName: auth?.user?.name,
+                        territoryContact: auth?.user?.contact,
+                      });
+                      setaddEnquiryVisible(false);
+                    }}
+                  >
+                    <Text style={Sstyles.buttonText}>Cancel</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[Sstyles.save]}
+                    // disabled={!isFormValid}
+                    onPress={() => {
+                      // if (!isFormValid) return;
+                      addEnquiry();
+                    }}
+                  >
+                    <Text style={Sstyles.buttonText}>Save</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
       </Modal>
       <Toast config={toastConfig} />
     </View>
@@ -1277,83 +1681,50 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     gap: 5,
   },
-  box1: {
-    width: '100%',
-    marginInline: 'auto',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 10,
-  },
-
-  box2: {
-    width: '100%',
-    marginTop: 20,
-    marginInline: 'auto',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 10,
-  },
   card: {
-    width: 171,
-    height: 90,
-    padding: 16,
-    gap: 8,
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    borderRadius: 16,
+    width: '50%',
     backgroundColor: '#0078DB',
-    // gradient workaround using overlay if needed
+    borderRadius: 8,
+    padding: 7,
+    marginVertical: 5,
   },
-
   content: {
-    width: 139,
-    height: 24,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    flexWrap: 'wrap',
-    borderRadius: 8,
-  },
-  label: {
-    width: 106,
-    height: 15,
-    fontSize: 12,
-    fontWeight: '500',
-    lineHeight: 15,
-    color: '#fff',
+    color: 'white',
   },
   iconWrapper: {
-    width: 24,
-    height: 24,
-
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    position: 'relative',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-
-    borderRadius: 80,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    padding: 10,
-    shadowRadius: 15,
-    elevation: 10, // For Android
+    padding: 2,
+    borderRadius: 6,
   },
-  vectorInner: {
-    width: 14,
-    height: 14,
+  label: {
+    fontSize: 12,
+    color: 'white',
   },
   amount: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#fff',
-    lineHeight: 24,
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 4,
+    color: 'white',
   },
-
+  percent: {
+    fontSize: 10,
+    color: 'white',
+  },
+  box1: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    // justifyContent: 'space-between',
+    gap: 5,
+    // marginTop: 2,
+  },
+  box2: {
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 5,
+    // marginTop: 2,
+  },
   text: {
     marginTop: 10,
     marginLeft: 10,
@@ -1384,6 +1755,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
     padding: 5,
     margin: 'auto',
+    marginTop: 10,
   },
 
   searchContainer: {

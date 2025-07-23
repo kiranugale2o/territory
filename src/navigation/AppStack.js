@@ -19,8 +19,15 @@ import Profile from '../screen/Profile';
 // import CalenderComponent from "../screen/Calender";
 import Svg, { Path } from 'react-native-svg';
 import React, { useContext, useEffect, useState } from 'react';
-import { Image, Keyboard, SafeAreaView, Text, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import {
+  Image,
+  Keyboard,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 //import { AuthContext } from "../context/AuthContext";
 import LinearGradient from 'react-native-linear-gradient';
 import Home from '../screen/Home';
@@ -41,14 +48,45 @@ import KYC from '../screen/Profile/kyc';
 import PostDetailScreen from '../component/community/PostDetails';
 import FollowersScreen from '../screen/Community/FollowersScreen';
 import FollowingScreen from '../screen/Community/FollowingScreen';
+import { Bell, BellDotIcon } from 'lucide-react-native';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function MyTabs() {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [data, setData] = useState();
+  const auth = useContext(AuthContext);
+  const navigation = useNavigation();
+  const getProfile = async () => {
+    try {
+      const token = await AsyncStorage.getItem('tPersonToken'); // Retrieve stored JWT
+
+      const response = await fetch(
+        'https://api.reparv.in/territory-partner/profile/',
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`, // Attach token
+          },
+        },
+      );
+
+      const data = await response.json();
+      console.log('Update response:', data);
+      auth?.setImage(data?.userimage);
+      setData(data);
+
+      // navigation.navigate("")
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+  };
 
   useEffect(() => {
+    getProfile();
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
       () => {
@@ -93,12 +131,59 @@ function MyTabs() {
         name="Dashboard"
         component={Home}
         options={{
-          headerTitle: 'Dashboard',
+          headerTitle: `Hello, ${auth?.user?.name}`,
           headerShadowVisible: false,
-
           headerStyle: {
             backgroundColor: 'white',
           },
+          headerRight: () => (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginRight: 15,
+                gap: 15,
+              }}
+            >
+              {/* Bell Icon */}
+              <TouchableOpacity
+                onPress={() => navigation.navigate('ViewSchedule')}
+              >
+                <View style={{ position: 'relative' }}>
+                  <Bell color="#000" size={24} />
+                  {auth?.isNotification && (
+                    <View
+                      style={{
+                        position: 'absolute',
+                        top: -1,
+                        right: 2,
+                        width: 8,
+                        height: 8,
+                        borderRadius: 4,
+                        backgroundColor: '#0069E1e', // you can change this to any color
+                      }}
+                    />
+                  )}
+                </View>
+              </TouchableOpacity>
+              {/* Profile Image */}
+              <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+                <Image
+                  source={
+                    auth?.image
+                      ? { uri: `https://api.reparv.in${auth?.image}` }
+                      : require('../../assets/community/user.png')
+                  }
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 19,
+                    overflow: 'hidden',
+                  }}
+                />
+              </TouchableOpacity>
+            </View>
+          ),
           tabBarIcon: ({ color, size }) => (
             <View>
               <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">

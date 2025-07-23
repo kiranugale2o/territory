@@ -157,6 +157,57 @@ const ClientInfoCard: React.FC<Props> = ({ enquiry }) => {
     message: '',
     state: '',
   });
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  useEffect(() => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (
+      !enquiryUpdateDetails.customer?.trim() ||
+      /\d/.test(enquiryUpdateDetails.customer)
+    ) {
+      newErrors.customer = 'Enter a valid name (no numbers)';
+    }
+
+    if (
+      !enquiryUpdateDetails.contact ||
+      !/^[6-9]\d{9}$/.test(enquiryUpdateDetails.contact)
+    ) {
+      newErrors.contact = 'Enter valid 10-digit mobile number';
+    }
+
+    if (!enquiryUpdateDetails.minbudget) {
+      newErrors.minbudget = 'Min budget is required';
+    }
+
+    if (!enquiryUpdateDetails.maxbudget) {
+      newErrors.maxbudget = 'Max budget is required';
+    }
+
+    if (!enquiryUpdateDetails.category) {
+      newErrors.category = 'Select a category';
+    }
+
+    if (!enquiryUpdateDetails.state) {
+      newErrors.state = 'Select a state';
+    }
+
+    if (!enquiryUpdateDetails.city) {
+      newErrors.city = 'Select a city';
+    }
+
+    if (!enquiryUpdateDetails.location?.trim()) {
+      newErrors.location = 'Location is required';
+    }
+
+    if (!enquiryUpdateDetails.message?.trim()) {
+      newErrors.message = 'Message is required';
+    }
+
+    setErrors(newErrors);
+    setIsFormValid(Object.keys(newErrors).length === 0);
+  }, [enquiryUpdateDetails]);
 
   const optionsr = [
     { label: 'Update', value: 'Update', color: 'black', select: false },
@@ -1801,29 +1852,40 @@ const ClientInfoCard: React.FC<Props> = ({ enquiry }) => {
                       </Text>
                       <TextInput
                         style={[Sstyles.input, { color: 'black' }]}
+                        placeholder="Enter full name"
+                        placeholderTextColor="gray"
                         value={enquiryUpdateDetails.customer}
-                        placeholderTextColor={'gray'}
-                        onChangeText={text => {
+                        onChangeText={text =>
                           setEnquiryUpdateDetails({
                             ...enquiryUpdateDetails,
                             customer: text,
-                          });
-                        }}
+                          })
+                        }
                       />
+                      {errors.customer && (
+                        <Text style={{ color: 'red' }}>{errors.customer}</Text>
+                      )}
+
                       <Text style={{ fontSize: 14, color: 'black' }}>
                         Contact Number
                       </Text>
                       <TextInput
                         style={[Sstyles.input, { color: 'black' }]}
-                        placeholderTextColor={'gray'}
-                        value={enquiryUpdateDetails?.contact}
-                        onChangeText={text => {
+                        placeholder="Enter contact number"
+                        placeholderTextColor="gray"
+                        keyboardType="numeric"
+                        value={enquiryUpdateDetails.contact}
+                        onChangeText={text =>
                           setEnquiryUpdateDetails({
                             ...enquiryUpdateDetails,
                             contact: text,
-                          });
-                        }}
+                          })
+                        }
                       />
+                      {errors.contact && (
+                        <Text style={{ color: 'red' }}>{errors.contact}</Text>
+                      )}
+
                       <Text style={{ fontSize: 14, color: 'black' }}>
                         Min-Budget
                       </Text>
@@ -2067,7 +2129,13 @@ const ClientInfoCard: React.FC<Props> = ({ enquiry }) => {
                           <Text style={Sstyles.buttonText}>Cancel</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                          style={Sstyles.save}
+                          style={[
+                            Sstyles.save,
+                            {
+                              backgroundColor: isFormValid ? '#0078DB' : '#ccc',
+                            },
+                          ]}
+                          disabled={!isFormValid}
                           onPress={updateEnquiry}
                         >
                           <Text style={Sstyles.buttonText}>Save</Text>

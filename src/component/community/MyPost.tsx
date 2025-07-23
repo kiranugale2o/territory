@@ -434,8 +434,8 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: '#fff',
     marginBottom: 24,
-    borderTopWidth: 0.3,
-    borderColor: 'gray',
+    borderTopWidth: 0,
+    //borderColor: 'gray',
   },
 
   /* header: avatar + name / time */

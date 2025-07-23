@@ -99,6 +99,7 @@ const Profile: React.FC = () => {
       const data = await response.json();
       console.log('Update response:', data);
       auth?.setImage(data?.userimage);
+      auth?.setUserName(userName);
       getProfile();
     } catch (error) {
       console.error('Error updating user:', error);

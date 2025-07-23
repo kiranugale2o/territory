@@ -34,15 +34,19 @@ interface AuthContextType {
   isLoding: boolean;
   isPaymentSuccess: boolean;
   flatName: string | null;
+  userName: string | null;
   token: string | null;
   user: UserType | null;
   image: string | null;
   propertyinfoId: number | null;
   dateRange: DateRangeType;
   propertyName: string | null;
+  isNotification: boolean;
+  setNotification: (value: boolean) => void;
   setUser: (user: UserType | null) => void;
   setToken: (token: string | null) => void;
   setFlatName: (flatName: string | null) => void;
+  setUserName: (flatName: string | null) => void;
   setIsLoggedIn: (value: boolean) => void;
   setLoading: (value: boolean) => void;
   setIsPaymentSuccess: (value: boolean) => void;
@@ -73,12 +77,14 @@ interface DateRangeType {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isNotification, setNotification] = useState(false);
   const [isLoding, setLoading] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [propertyName, setPropertyName] = useState<string | null>('');
   const [user, setUser] = useState<UserType | null>(null);
   const [image, setImage] = useState<string | null>(null);
   const [flatName, setFlatName] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
   const [propertyinfoId, setPropertyinfoId] = useState<number | null>(null);
   const [dateRange, setDateRange] = useState<DateRangeType>({
     startDate: null,
@@ -133,6 +139,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         propertyName,
         setFlatName,
         user,
+        isNotification,
+        setNotification,
+        userName,
+        setUserName,
         setUser,
         setToken,
         setIsLoggedIn,
