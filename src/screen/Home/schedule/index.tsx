@@ -386,7 +386,7 @@ interface Props {
 }
 const StatusCard: React.FC<Props> = ({ enquiry }) => {
   const [data, setData] = useState<SalesPerson | null>(null);
-  const [property, setProperty] = useState<PropertyInfo| null>(null);
+  const [property, setProperty] = useState<PropertyInfo | null>(null);
   const getProfile = async (id: any) => {
     try {
       const response = await fetch(

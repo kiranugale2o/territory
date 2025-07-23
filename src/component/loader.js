@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import LottieView from 'lottie-react-native';
 
 const Loader = () => {
   const [loading, setLoading] = useState(true);
@@ -12,10 +13,13 @@ const Loader = () => {
 
   return (
     <View style={styles.container}>
-      {loading ? (
-        <ActivityIndicator size="large" color="#0078DB" />
-      ) : (
-        <Text style={styles.text}>Content Loaded</Text>
+      {loading && (
+        <LottieView
+          source={require('../../assets/animations/loading.json')} // <- Make sure path is correct
+          autoPlay
+          loop
+          style={styles.lottie}
+        />
       )}
     </View>
   );
@@ -25,12 +29,13 @@ export default Loader;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.8)', // Optional: loader overlay background
   },
-  text: {
-    fontSize: 18,
-    fontWeight: 'bold',
+  lottie: {
+    width: 550,
+    height: 550,
   },
 });

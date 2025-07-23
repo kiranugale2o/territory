@@ -483,12 +483,23 @@ const PropertyCard: React.FC<Props> = ({ pdata }) => {
           <Text style={styles.title}>{pdata.propertyName}</Text>
           <View style={styles.pricingRow}>
             <Text style={styles.emi}>
-              EMI ₹{pdata.emi}
+              EMI{' '}
+              {Number(pdata?.emi).toLocaleString('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0,
+              })}
               /m
             </Text>
             <View style={styles.priceBox}>
               <Text style={styles.strikePrice}>₹{pdata?.totalSalesPrice}</Text>
-              <Text style={styles.actualPrice}>₹{pdata?.totalOfferPrice}</Text>
+              <Text style={styles.actualPrice}>
+                {Number(pdata?.totalOfferPrice).toLocaleString('en-IN', {
+                  style: 'currency',
+                  currency: 'INR',
+                  maximumFractionDigits: 0,
+                })}
+              </Text>
               <Text style={styles.extra}>+Other Charges</Text>
             </View>
           </View>

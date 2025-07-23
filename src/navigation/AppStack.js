@@ -49,7 +49,8 @@ import PostDetailScreen from '../component/community/PostDetails';
 import FollowersScreen from '../screen/Community/FollowersScreen';
 import FollowingScreen from '../screen/Community/FollowingScreen';
 import { Bell, BellDotIcon } from 'lucide-react-native';
-
+import Sound from 'react-native-sound';
+import { playNotificationSound } from '../utils';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -85,7 +86,43 @@ function MyTabs() {
     }
   };
 
+  const fetchEnquiries = async () => {
+    try {
+      const token = auth?.user?.id; // make sure you stored it at login
+
+      const response = await fetch(
+        'https://api.reparv.in/territory-partner/enquirers/',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`, // token required for req.user.id to work
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Fetch error:', errorData);
+        return;
+      }
+
+      const data = await response.json();
+      const newStatusCount = data.filter(
+        item => item.territorystatus === 'New',
+      ).length;
+
+      if (data.filter(item => item.territorystatus === 'New').length > 0) {
+        auth?.setNotification(true);
+        playNotificationSound();
+      }
+    } catch (error) {
+      console.error('API call failed:', error);
+    }
+  };
+
   useEffect(() => {
+    fetchEnquiries();
     getProfile();
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -159,8 +196,8 @@ function MyTabs() {
                         right: 2,
                         width: 8,
                         height: 8,
-                        borderRadius: 4,
-                        backgroundColor: '#0069E1e', // you can change this to any color
+                        borderRadius: 10,
+                        backgroundColor: '#0069E1', // you can change this to any color
                       }}
                     />
                   )}

@@ -173,13 +173,7 @@ const Home: React.FC = () => {
       }
 
       const data = await response.json();
-      const newStatusCount = data.filter(
-        (item: any) => item.territorystatus === 'New',
-      ).length;
 
-      if (newStatusCount !== 0) {
-        auth?.setNotification(true);
-      }
       setEnquiries(data);
     } catch (error) {
       console.error('API call failed:', error);
@@ -536,8 +530,8 @@ const Home: React.FC = () => {
   const saleMinBudgetOptions = [
     { label: '10 Lakh', value: 1000000 },
     { label: '25 Lakh', value: 2500000 },
-    { label: '75 Lakh', value: 7500000 },
     { label: '50 Lakh', value: 5000000 },
+    { label: '75 Lakh', value: 7500000 },
     { label: '1 Crore', value: 10000000 },
     { label: '2 Crore', value: 20000000 },
     { label: '3 Crore', value: 30000000 },
