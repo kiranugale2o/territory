@@ -19,7 +19,9 @@ const FollowingScreen = () => {
     const fetchFollowing = async () => {
       try {
         const res = await fetch(
-          `https://api.reparv.in/territoryapp/user/add/${auth?.user?.id}/${'territory'}/following`
+          `https://api.reparv.in/territoryapp/user/add/${
+            auth?.user?.id
+          }/${'territory'}/following`,
         );
         const data = await res.json();
         setFollowing(data);
@@ -38,33 +40,34 @@ const FollowingScreen = () => {
   }
 
   return (
-    <View style={{flex:1,backgroundColor:'white'}}>
-    <FlatList
-      data={following}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => (
-        <View style={styles.card}>
-          <Image
-            source={
-              item?.userimage
-                ? { uri: `https://api.reparv.in${item.userimage}` }
-                : require('../../../assets/community/user.png')
-            }
-            style={styles.avatar}
-          />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.name}>{item?.fullname || 'Unnamed User'}</Text>
-            {/* <Text style={styles.role}>{item.email || 'No email'}</Text> */}
-          </View>
+    <View style={{ flex: 1, backgroundColor: 'white' }}>
+      <FlatList
+        data={following}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Image
+              source={
+                item?.userimage
+                  ? { uri: `https://api.reparv.in${item.userimage}` }
+                  : require('../../../assets/community/user.png')
+              }
+              style={styles.avatar}
+            />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.name}>
+                {item?.fullname || 'Unnamed User'}
+              </Text>
+              {/* <Text style={styles.role}>{item.email || 'No email'}</Text> */}
+            </View>
 
-          {/* <TouchableOpacity style={styles.followBtn}>
+            {/* <TouchableOpacity style={styles.followBtn}>
             <Text style={styles.followText}>Following</Text>
           </TouchableOpacity> */}
-        </View>
-      )}
-    
-    />
-      </View>
+          </View>
+        )}
+      />
+    </View>
   );
 };
 
@@ -86,6 +89,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: '600',
+    color: 'black',
   },
   role: {
     fontSize: 13,

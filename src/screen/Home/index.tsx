@@ -514,13 +514,16 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     fetchMeetings();
-    // const interval = setInterval(fetchMeetings, 30000); //tch every 30s
-    // return () => clearInterval(interval); // cleanup on unmount
+
+    if (enquiries.filter(item => item.territorystatus === 'New').length === 0) {
+      auth?.setNotification(false);
+    }
   }, []);
   useEffect(() => {
     fetchStates();
     fetchNewCountData();
     fetchEnquiries(); // initial fetch
+
     const interval = setInterval(fetchEnquiries, 5000); // fetch every 30s
     return () => clearInterval(interval); // cleanup on unmount
   }, []);

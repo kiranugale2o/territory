@@ -333,7 +333,7 @@ function MyTabs() {
 }
 
 // Stack Navigator Component
-function AppStack() {
+const AppStack = ({ initialRouteName = 'MainTabs' }) => {
   const auth = useContext(AuthContext);
   function capitalizeWords(str) {
     return str
@@ -343,7 +343,7 @@ function AppStack() {
       .join(' ');
   }
   return (
-    <Stack.Navigator initialRouteName="MainTabs">
+    <Stack.Navigator initialRouteName={initialRouteName}>
       {/* Main App Tabs inside a screen */}
       <Stack.Screen
         name="MainTabs"
@@ -459,6 +459,6 @@ function AppStack() {
       />
     </Stack.Navigator>
   );
-}
+};
 
 export default AppStack;

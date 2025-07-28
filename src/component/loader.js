@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import LottieView from 'lottie-react-native';
 
 const Loader = () => {
@@ -13,14 +13,7 @@ const Loader = () => {
 
   return (
     <View style={styles.container}>
-      {loading && (
-        <LottieView
-          source={require('../../assets/animations/loading.json')} // <- Make sure path is correct
-          autoPlay
-          loop
-          style={styles.lottie}
-        />
-      )}
+      {loading && <ActivityIndicator size={'large'} color="#0996f4ff" />}
     </View>
   );
 };
