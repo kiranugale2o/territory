@@ -512,9 +512,34 @@ const Home: React.FC = () => {
     }
   };
 
+   const fetchUser = async () => {
+    setLoading(true)
+      if (auth?.user?.id && auth.token) {
+        try {
+          const res = await fetch(
+            `https://api.reparv.in/admin/territorypartner/get/${auth.user.id}`,
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+            },
+          );
+          const data = await res.json();
+          if( !data.adharno || data.adharno.trim().length === 0){
+            navigation.navigate('KYC')
+          }
+        } catch (err) {
+          console.log('Error fetching user details:', err);
+           setLoading(false) 
+        } 
+      } else {
+       setLoading(false) 
+      }
+    };
+
+
   useEffect(() => {
     fetchMeetings();
-
+fetchUser()
     if (enquiries.filter(item => item.territorystatus === 'New').length === 0) {
       auth?.setNotification(false);
     }
@@ -523,11 +548,12 @@ const Home: React.FC = () => {
     fetchStates();
     fetchNewCountData();
     fetchEnquiries(); // initial fetch
-
+fetchUser()
     const interval = setInterval(fetchEnquiries, 5000); // fetch every 30s
     return () => clearInterval(interval); // cleanup on unmount
   }, []);
   if (loading) return <Loader />;
+
 
   // For Sale
   const saleMinBudgetOptions = [

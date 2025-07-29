@@ -19,73 +19,74 @@ import { RootStackParamList } from './src/types';
 export default function App() {
   return (
     <AuthProvider>
-      <NavigationContainer>
+      <NavigationContainer >
         <MainApp />
       </NavigationContainer>
     </AuthProvider>
   );
 }
 
-// Separate component that consumes the context safely
-function MainApp() {
-  type NavigationProp = NativeStackNavigationProp<
-    RootStackParamList,
-    'Sign_In'
-  >;
-  const auth = useContext(AuthContext);
-  const navigation = useNavigation<NavigationProp>();
+import BackgroundFetch from "react-native-background-fetch";
 
+function MainApp() {
+  const auth = useContext(AuthContext);
   const [userData, setUserData] = useState<any>(null);
   const [isFetching, setIsFetching] = useState(true);
+useEffect(() => {
+  const setupBackgroundFetch = async () => {
+    const status = await BackgroundFetch.configure(
+      {
+        minimumFetchInterval: 15, // Android only, in minutes
+        stopOnTerminate: false,
+        startOnBoot: true,
+        enableHeadless: true,
+      },
+      async (taskId) => {
+        console.log('[BackgroundFetch] Event received:', taskId);
+        // You can run check manually here too (optional)
+        BackgroundFetch.finish(taskId);
+      },
+      (error) => {
+        console.warn('[BackgroundFetch] Failed to configure', error);
+      }
+    );
 
-  const showDetails = async () => {
-    try {
-      setIsFetching(true);
-      const res = await fetch(
-        `https://api.reparv.in/admin/territorypartner/get/${auth?.user?.id}`,
-        {
-          method: 'GET',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-        },
-      );
-      if (!res.ok) throw new Error('Failed to fetch details');
-      const data = await res.json();
-      setUserData(data);
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setIsFetching(false);
-    }
+    console.log('[BackgroundFetch] Configured with status:', status);
   };
 
-  console.log('userData:', userData);
-  console.log('adharno:', userData?.adharno);
-  console.log(
-    'Is empty or missing?',
-    !userData?.adharno || userData.adharno.trim() === '',
-  );
+  setupBackgroundFetch();
+}, []);
 
   useEffect(() => {
-    if (auth?.user?.id) {
-      showDetails();
-    }
-  }, [auth?.user?.id]);
+    const fetchUser = async () => {
+      if (auth?.user?.id && auth.token) {
+        try {
+          const res = await fetch(
+            `https://api.reparv.in/admin/territorypartner/get/${auth.user.id}`,
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+            },
+          );
+          const data = await res.json();
+          setUserData(data);
+        } catch (err) {
+          console.log('Error fetching user details:', err);
+        } finally {
+          setIsFetching(false);
+        }
+      } else {
+        setIsFetching(false);
+      }
+    };
 
-  if (!auth || auth.isLoding || isFetching) {
-    return <Loader />;
-  }
+    fetchUser();
+  }, [auth?.user?.id, auth?.token]);
 
-  if (auth.token === null) {
-    return <AuthStack />;
-  }
+  if (auth?.isLoding || isFetching) return <Loader />;
+  if (!auth?.token || !auth?.user) return <AuthStack />;
+  if (!userData) return <Loader />;
 
-  // ✅ Render nothing until userData is available
-  if (!userData) {
-    return <Loader />;
-  }
-
-  // ✅ Check KYC based on adharno
   const isKYCIncomplete =
     !userData.adharno || userData.adharno.trim().length === 0;
 

@@ -50,6 +50,8 @@ const Schedule: React.FC = () => {
       }
 
       const data = await response.json();
+      console.log(data,'enwwwwww');
+      
       setEnquiries(data);
     } catch (error) {
       console.error('API call failed:', error);
@@ -508,30 +510,29 @@ const StatusCard: React.FC<Props> = ({ enquiry }) => {
   };
 
   useEffect(() => {
-    getProfile(enquiry?.enquirersid);
-    fetchProperty();
-    startAutoRejectTimer();
+  // when new enquiry is assigned
+  getProfile(enquiry?.enquirersid);
+  fetchProperty();
+  startAutoRejectTimer(); // this stores expiry in AsyncStorage
 
-    const subscription = AppState.addEventListener(
-      'change',
-      async nextAppState => {
-        const isNowActive = nextAppState === 'active';
+  // App state listener for safety
+  const subscription = AppState.addEventListener(
+    'change',
+    async nextAppState => {
+      const isNowActive = nextAppState === 'active';
+      if (appState.current.match(/inactive|background/) && isNowActive) {
+        await autoRejectIfExpired();
+      }
+      appState.current = nextAppState;
+      setAppIsActive(isNowActive);
+    },
+  );
 
-        if (appState.current.match(/inactive|background/) && isNowActive) {
-          console.log('⏰ App is active again, checking auto-reject...');
-          await autoRejectIfExpired();
-        }
-
-        appState.current = nextAppState;
-        setAppIsActive(isNowActive);
-      },
-    );
-
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      subscription.remove();
-    };
-  }, []);
+  return () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    subscription.remove();
+  };
+}, []);
 
   const { relative, fullDate, timeOnly } = formatUpdatedAt(enquiry.updated_at);
 
@@ -562,7 +563,7 @@ const StatusCard: React.FC<Props> = ({ enquiry }) => {
       <View style={Statusstyles.container}>
         <InfoRow label="Assign Date:" value={fullDate} />
         <InfoRow label="Visit Date:" value={enquiry?.visitdate} />
-        <InfoRow label="Time:" value={timeOnly} />
+        <InfoRow label="Visit Time Slot:" value={enquiry?.territorytimeslot} />
         <InfoRow
           label="Location:"
           value={`${property?.propertyName}, ${property?.address}, ${property?.city}`}

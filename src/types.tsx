@@ -140,6 +140,7 @@ export interface Enquiry {
   message: string;
   visitdate: string;
   territorystatus: string;
+  territorytimeslot:string;
   state: string;
   commissionAmount: number;
   updated_at: string;

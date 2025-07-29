@@ -857,7 +857,8 @@ const ClientInfoCard: React.FC<Props> = ({ enquiry }) => {
   );
 
   // Use it as shown above
-
+  
+  
   const propertyOptions: ModalOption[] = propertyList
     .filter(
       (property: PropertyInfo) =>
@@ -1628,7 +1629,7 @@ const ClientInfoCard: React.FC<Props> = ({ enquiry }) => {
                               borderRadius: 16,
                             }}
                           >
-                            {enquiryDetails.visitdate}
+                            {enquiryDetails.visitdate} {'  ||  '}{enquiryDetails?.territorytimeslot}
                           </Text>
                         </View>
                       )}
