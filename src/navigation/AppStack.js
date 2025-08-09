@@ -204,7 +204,9 @@ function MyTabs() {
                 </View>
               </TouchableOpacity>
               {/* Profile Image */}
-              <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+              <TouchableOpacity 
+                            onPress={() => navigation.navigate('MainTabs', { screen: 'Profile' })}
+              >
                 <Image
                   source={
                     auth?.image

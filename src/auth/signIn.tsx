@@ -31,6 +31,7 @@ const { width, height } = Dimensions.get('window');
 interface ErrorState {
   emailoruser: string;
   password: string;
+  
 }
 const SignIn = (): JSX.Element => {
   type NavigationProp = NativeStackNavigationProp<

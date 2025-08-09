@@ -1,4 +1,4 @@
-import {ActivityIndicator, ScrollView, Text, View} from 'react-native';
+import {ActivityIndicator, FlatList, ScrollView, Text, View} from 'react-native';
 import PropertyCard from '../../component/PropertyCard';
 import {PropertyInfo, RootStackParamList} from '../../types';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -60,26 +60,16 @@ const BookingFlats: React.FC = () => {
       }}>
       {/* Cards */}
       {/* .filter(property => property?.propertyCategory === 'Resale') */}
-      <ScrollView>
-        {Array.isArray(flats) && flats.length > 0 ? (
-          flats.map((d, index) => <PropertyCard key={index} pdata={d} />)
-        ) : (
-          <Text
-            style={{
-              alignContent: 'center',
-              fontSize: 22,
-              margin: 'auto',
-
-              top: 100,
-
-              marginTop: 'auto',
-              justifyContent: 'center',
-              color:'black'
-            }}>
-            No Property Found !
-          </Text>
-        )}
-      </ScrollView>
+    <FlatList
+  data={Array.isArray(flats) ? flats : []}
+  keyExtractor={(item, index) => index.toString()}
+  renderItem={({ item }) => <PropertyCard pdata={item} />}
+  ListEmptyComponent={
+    <View style={{ alignItems: 'center', marginTop: 100 }}>
+      <Text style={{ fontSize: 22 }}>No Property Found!</Text>
+    </View>
+  }
+/>
     </View>
   );
 };

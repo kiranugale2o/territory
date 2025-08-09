@@ -43,17 +43,6 @@ const icons = {
   security: require('../../../assets/icons/security.png'),
 };
 
-// type PropertyDetailsRouteProp = RouteProp<
-//   RootStackParamList,
-//   'PropertyDetails'
-// >;
-
-// const PropertyDetails: React.FC = () => {
-//   const route = useRoute<PropertyDetailsRouteProp>();
-//   const [showDrawer, setshowDrawer] = useState(false);
-// const { propertyid } = route.params;
-// const { enquirersid } = route.params;
-// const { salespersonid } = route.params;
 const PropertyDetails = () => {
   const route = useRoute();
   const { propertyid, enquirersid, salespersonid, booktype } = route.params;
@@ -351,6 +340,7 @@ const PropertyDetails = () => {
                   style={{
                     fontSize: 11,
                     marginTop: 4,
+                    color:'gray',
                     textAlign: 'center',
                   }}
                 >

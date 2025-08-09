@@ -22,6 +22,7 @@ import {
   Alert,
   Dimensions,
   Platform,
+  FlatList,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import UserPostCard from '../../component/community/UserPost';
@@ -575,48 +576,38 @@ const Community: React.FC = () => {
           </View>
 
           <View style={{ width: '100%', marginTop: 20 }}>
-            <ScrollView>
-              {filteredUser.length !== 0 ? (
-                <>
-                  {filteredUser.map(
-                    (d, i) =>
-                      d?.status === 'Active' &&
-                      d?.salespersonsid !== auth?.user?.id && (
-                        <TouchableOpacity
-                          onPress={() => {
-                            navigation.navigate('UserProfile', { user: d });
-                          }}
-                          key={i}
-                          style={styles.container3}
-                        >
-                          <View style={styles.profileContainer}>
-                            <Image
-                              source={
-                                d.userimage
-                                  ? {
-                                      uri: `https://api.reparv.in${d.userimage}`,
-                                    }
-                                  : require('../../../assets/community/user.png')
-                              }
-                              style={styles.avatar}
-                            />
-                            <View style={styles.textContainer}>
-                              <Text style={styles.name}>{d.fullname}</Text>
-                              <Text style={{ fontSize: 13, color: 'black' }}>
-                                {d.role}
-                              </Text>
-                            </View>
-                          </View>
-                        </TouchableOpacity>
-                      ),
-                  )}
-                </>
-              ) : (
-                <Text style={{ fontSize: 18, color: 'black', padding: 20 }}>
-                  Not Found Any User !
-                </Text>
-              )}
-            </ScrollView>
+           <FlatList
+  data={filteredUser.filter(
+    d => d?.status === 'Active' && d?.salespersonsid !== auth?.user?.id
+  )}
+  keyExtractor={(item, index) => index.toString()}
+  renderItem={({ item }) => (
+    <TouchableOpacity
+      onPress={() => navigation.navigate('UserProfile', { user: item })}
+      style={styles.container3}
+    >
+      <View style={styles.profileContainer}>
+        <Image
+          source={
+            item.userimage
+              ? { uri: `https://api.reparv.in${item.userimage}` }
+              : require('../../../assets/community/user.png')
+          }
+          style={styles.avatar}
+        />
+        <View style={styles.textContainer}>
+          <Text style={styles.name}>{item.fullname}</Text>
+          <Text style={{ fontSize: 13, color: 'black' }}>{item.role}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  )}
+  ListEmptyComponent={
+    <Text style={{ fontSize: 18, color: 'black', padding: 20 }}>
+      Not Found Any User!
+    </Text>
+  }
+/>
           </View>
         </View>
       ) : selectedTab === 'MyPost' ? (
